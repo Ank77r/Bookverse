@@ -1,0 +1,17 @@
+2. Edit Profile (Display Name)
+The Problem: Your users are stuck with names like "pandeyankur1405" or just "Reader".
+
+The Feature: A simple settings modal in the Home Page Navbar.
+
+Function: Input field to change "Display Name."
+
+Why Basic: It’s a simple update to the existing User Document. No new collections needed.
+
+3. Estimated Reading Time
+The Problem: Users don't know if a chapter is 5 minutes or 50 minutes long.
+
+The Feature: In the Reader sidebar or at the top of the chapter, show: "~5 min read".
+
+Logic: Word Count / 200 = Minutes.
+
+Why Basic: It’s purely client-side Math using JavaScript. No database changes required.

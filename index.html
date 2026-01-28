@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BookVerse | Premium Story Platform</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,700;1,600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="loading">
+
+    <div class="preloader" id="preloader">
+        <canvas id="loader-canvas"></canvas>
+        <div class="loader-center" id="loader-center">
+            <div class="loader-logo"><i class="fas fa-book-open"></i> BookVerse</div>
+            <div class="loading-status" id="status-text">Gathering Magic...</div>
+        </div>
+    </div>
+
+    <div class="search-overlay" id="searchOverlay">
+        <div class="search-modal">
+            <div class="search-header">
+                <div class="search-bar-premium">
+                    <i class="fas fa-search search-icon-lead"></i>
+                    <input type="text" id="searchInput" placeholder="Search for stories, authors, or genres..." autocomplete="off">
+                    <div class="spinner" id="searchSpinner"></div>
+                    <button class="search-clear-btn" id="searchClearBtn" title="Clear"><i class="fas fa-times"></i></button>
+                </div>
+                <div class="search-dropdown" id="searchDropdown"></div>
+            </div>
+            <div class="search-body">
+                <div class="search-section">
+                    <h4 class="search-label">Popular Tags</h4>
+                    <div class="tag-cloud">
+                        <span class="search-tag"><i class="fas fa-bolt"></i> Cyberpunk</span>
+                        <span class="search-tag"><i class="fas fa-dragon"></i> Dark Fantasy</span>
+                        <span class="search-tag"><i class="fas fa-heart"></i> Slow Burn</span>
+                    </div>
+                </div>
+            </div>
+            <div class="search-footer">
+                <div class="shortcut-group"><span class="key">↵</span> <span>to select</span></div>
+                <div class="shortcut-group"><span class="key">Esc</span> <span>to close</span></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="auth-overlay" id="authOverlay">
+        <div class="auth-modal">
+            <button class="close-auth" id="closeAuth"><i class="fas fa-times"></i></button>
+            
+            <div class="auth-header">
+                <div class="auth-tab active" data-tab="signin">Sign In</div>
+                <div class="auth-tab" data-tab="signup">Sign Up</div>
+            </div>
+            
+            <div class="auth-body active" id="signinForm">
+                <h3 class="auth-title">Welcome Back</h3>
+                <p class="auth-subtitle">Continue your journey in the BookVerse.</p>
+                
+                <div class="social-login">
+                    <button class="btn-social google" id="google-signin-btn">
+                        <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="G">
+                        <span>Google</span>
+                    </button>
+                </div>
+
+                <div class="divider"><span>Or continue with email</span></div>
+
+                <form class="auth-form">
+                    <div class="input-group-auth">
+                        <i class="fas fa-envelope"></i>
+                        <input type="email" placeholder="Email Address" required>
+                    </div>
+                    <div class="input-group-auth">
+                        <i class="fas fa-lock"></i>
+                        <input type="password" placeholder="Password" required>
+                    </div>
+                    <div class="form-extras">
+                        <label class="checkbox"><input type="checkbox"> Remember me</label>
+                        <a href="#" class="forgot-link">Forgot password?</a>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-block glow-effect">Sign In</button>
+                </form>
+            </div>
+
+            <div class="auth-body" id="signupForm">
+                <h3 class="auth-title">Create Account</h3>
+                <p class="auth-subtitle">Start writing your own legacy today.</p>
+                
+                <div class="social-login">
+                    <button class="btn-social google" id="google-signup-btn">
+                        <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="G">
+                        <span>Google</span>
+                    </button>
+                </div>
+
+                <div class="divider"><span>Or register with email</span></div>
+
+                <form class="auth-form">
+                    <div class="input-group-auth">
+                        <i class="fas fa-user"></i>
+                        <input type="text" placeholder="Full Name" required>
+                    </div>
+                    <div class="input-group-auth">
+                        <i class="fas fa-envelope"></i>
+                        <input type="email" placeholder="Email Address" required>
+                    </div>
+                    <div class="input-group-auth">
+                        <i class="fas fa-lock"></i>
+                        <input type="password" placeholder="Password" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-block glow-effect">Create Account</button>
+                </form>
+            </div>
+
+        </div>
+    </div>
+
+    <canvas id="particle-canvas"></canvas>
+    <div class="cursor-glow"></div>
+
+    <nav class="navbar" id="navbar">
+        <div class="container nav-inner">
+            <a href="#" class="logo"><div class="logo-box"><i class="fas fa-book-open"></i></div>BookVerse</a>
+            <div class="nav-links">
+                <a href="#featured" class="nav-item">Discover</a>
+                <a href="#authors" class="nav-item">Authors</a>
+                <a href="#genres" class="nav-item">Genres</a>
+                <a href="#footer" class="nav-item">Community</a>
+            </div>
+            <div class="nav-actions">
+                <button class="icon-btn" id="searchTrigger" title="Search"><i class="fas fa-search"></i></button>
+                <button class="icon-btn" id="themeToggle" title="Switch Theme"><i class="fas fa-moon"></i></button>
+                <a href="publish-hub.html" class="btn btn-primary glow-effect"><i class="fas fa-pen-nib"></i> Start Writing</a>
+                <button class="btn btn-outline" id="signInTrigger">Sign In</button>
+            </div>
+        </div>
+    </nav>
+
+    <section class="hero">
+        <div class="hero-bg-accent"></div>
+        <div class="container hero-grid">
+            <div class="hero-content reveal-up">
+                <div class="badge-pill"><i class="fas fa-crown text-gold"></i> The #1 Premium Story Platform</div>
+                <h1>Where Stories <br> <span class="text-gradient animated">Come Alive.</span></h1>
+                <p class="hero-desc">Dive into immersive worlds. Discover chart-topping fiction, connect with favorite authors, and publish your own masterpiece.</p>
+                <div class="hero-buttons">
+                    <a href="#featured" class="btn btn-xl btn-primary glow-effect">Start Reading Free <i class="fas fa-arrow-right"></i></a>
+                    <a href="publish-hub.html" class="btn btn-xl btn-outline">Publish Your Book</a>
+                </div>
+                <div class="stats-row">
+                    <div class="stat-item"><h3 class="counter" data-target="250000">0</h3><p>Stories</p></div>
+                    <div class="stat-item"><h3 class="counter" data-target="50000000">0</h3><p>Readers</p></div>
+                    <div class="stat-item"><h3 class="counter" data-target="2000000">0</h3><p>5-Star Reviews</p></div>
+                </div>
+            </div>
+            
+            <div class="hero-visuals reveal-up delay-1">
+                <div class="visual-stack">
+                    <div id="stack-back" class="hero-card back-card"></div>
+                    <a id="stack-front" href="#" class="hero-card front-card">
+                        <img id="hero-img" src="https://via.placeholder.com/600x900" alt="Hero Book">
+                        <div class="card-shine"></div>
+                        <div class="floating-badge"><i class="fas fa-fire"></i> <span id="hero-badge">Trending #1</span></div>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="section" id="featured">
+        <div class="container">
+            <div class="section-header reveal-up">
+                <span class="sub-label">CURATED PICKS</span>
+                <h2>Featured Stories</h2>
+            </div>
+            <div id="home-book-grid" class="bento-grid-dynamic reveal-up delay-1">
+                <p style="color:var(--text-muted); width:100%; text-align:center;">Summoning stories from the void...</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="section bg-darker" id="authors">
+        <div class="container">
+            <div class="section-header reveal-up">
+                <span class="sub-label">COMMUNITY LEADERS</span>
+                <h2>Popular Authors</h2>
+            </div>
+            <div class="author-grid reveal-up delay-1">
+                <div class="author-card hover-scale">
+                    <div class="author-header"><img src="https://randomuser.me/api/portraits/men/32.jpg" alt="Author" class="author-img"></div>
+                    <div class="author-info"><h3>Ankur Pandey</h3><p>Fantasy & Dark Fantasy</p></div>
+                    <div class="author-stats"><div class="a-stat"><span>2.3M</span> Reads</div><div class="a-stat"><span>125K</span> Followers</div></div>
+                    <button class="btn btn-secondary btn-block follow-btn">Follow</button>
+                </div>
+                <div class="author-card hover-scale">
+                    <div class="author-header"><img src="https://randomuser.me/api/portraits/women/44.jpg" alt="Author" class="author-img"></div>
+                    <div class="author-info"><h3>Sarah K. Walker</h3><p>Sci-Fi & Cyberpunk</p></div>
+                    <div class="author-stats"><div class="a-stat"><span>1.5M</span> Reads</div><div class="a-stat"><span>89K</span> Followers</div></div>
+                    <button class="btn btn-secondary btn-block follow-btn">Follow</button>
+                </div>
+                <div class="author-card hover-scale">
+                    <div class="author-header"><img src="https://randomuser.me/api/portraits/men/85.jpg" alt="Author" class="author-img"></div>
+                    <div class="author-info"><h3>Marcus Chen</h3><p>Contemporary Romance</p></div>
+                    <div class="author-stats"><div class="a-stat"><span>1.8M</span> Reads</div><div class="a-stat"><span>110K</span> Followers</div></div>
+                    <button class="btn btn-secondary btn-block follow-btn">Follow</button>
+                </div>
+                <div class="author-card hover-scale">
+                    <div class="author-header"><img src="https://randomuser.me/api/portraits/women/65.jpg" alt="Author" class="author-img"></div>
+                    <div class="author-info"><h3>Elena Vega</h3><p>Thriller & Mystery</p></div>
+                    <div class="author-stats"><div class="a-stat"><span>900K</span> Reads</div><div class="a-stat"><span>45K</span> Followers</div></div>
+                    <button class="btn btn-secondary btn-block follow-btn">Follow</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="section" id="genres">
+        <div class="container">
+            <div class="section-header reveal-up">
+                <span class="sub-label">EXPLORE BY CATEGORY</span>
+                <h2>Browse Genres</h2>
+            </div>
+            <div class="genre-grid reveal-up delay-1">
+                <div class="genre-box hover-lift"><div class="icon-circle c-fantasy"><i class="fas fa-dragon"></i></div><h4>Fantasy</h4><span>45K+</span></div>
+                <div class="genre-box hover-lift"><div class="icon-circle c-romance"><i class="fas fa-heart"></i></div><h4>Romance</h4><span>38K+</span></div>
+                <div class="genre-box hover-lift"><div class="icon-circle c-scifi"><i class="fas fa-rocket"></i></div><h4>Sci-Fi</h4><span>22K+</span></div>
+                <div class="genre-box hover-lift"><div class="icon-circle c-mystery"><i class="fas fa-search"></i></div><h4>Mystery</h4><span>28K+</span></div>
+                <div class="genre-box hover-lift"><div class="icon-circle c-action"><i class="fas fa-bolt"></i></div><h4>Action</h4><span>32K+</span></div>
+                <div class="genre-box hover-lift"><div class="icon-circle c-horror"><i class="fas fa-ghost"></i></div><h4>Horror</h4><span>15K+</span></div>
+            </div>
+        </div>
+    </section>
+
+    <footer id="footer">
+        <div class="container">
+            <div class="footer-top">
+                <div class="footer-col brand-col">
+                    <a href="#" class="logo"><div class="logo-box"><i class="fas fa-book-open"></i></div>BookVerse</a>
+                    <p>The world's premier platform for immersive storytelling. Read, write, and connect with a global community.</p>
+                    <div class="newsletter-box">
+                        <h4>Subscribe to our newsletter</h4>
+                        <div class="input-group"><input type="email" placeholder="Enter your email"><button class="btn btn-primary"><i class="fas fa-paper-plane"></i></button></div>
+                    </div>
+                </div>
+                
+                <div class="footer-col">
+                    <h4>Platform</h4>
+                    <ul class="footer-links">
+                        <li><a href="#featured">Discover</a></li>
+                        <li><a href="#featured">Trending</a></li>
+                        <li><a href="#authors">Authors</a></li>
+                        <li><a href="#footer">Community</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-col">
+                    <h4>Writers</h4>
+                    <ul class="footer-links">
+                        <li><a href="publish-hub.html">Start Writing</a></li>
+                        <li><a href="#">Writer Resources</a></li>
+                        <li><a href="#">Contests</a></li>
+                        <li><a href="#">Monetization</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-col">
+                    <h4>Company</h4>
+                    <ul class="footer-links">
+                        <li><a href="#">About Us</a></li>
+                        <li><a href="#">Careers</a></li>
+                        <li><a href="#">Privacy Policy</a></li>
+                        <li><a href="#">Terms of Service</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="footer-bottom">
+                <p>&copy; 2026 BookVerse Inc. All rights reserved.</p>
+                <div class="social-links">
+                    <a href="#"><i class="fab fa-twitter"></i></a>
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                    <a href="#"><i class="fab fa-discord"></i></a>
+                    <a href="#"><i class="fab fa-tiktok"></i></a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <div id="toast-container"></div>
+    <!-- Custom Confirm Dialog -->
+    <div id="custom-confirm-overlay" class="custom-confirm-overlay">
+        <div class="custom-confirm-modal">
+            <div class="custom-confirm-message" id="customConfirmMessage"></div>
+            <div class="custom-confirm-actions">
+                <button id="customConfirmCancel" class="custom-confirm-btn cancel">Cancel</button>
+                <button id="customConfirmOk" class="custom-confirm-btn ok">OK</button>
+            </div>
+        </div>
+    </div>
+    <script type="module" src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js"></script>
+    <script type="module" src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js"></script>
+    <script type="module" src="firebase-config.js"></script>
+    <script type="module" src="auth.js"></script>
+    <script type="module" src="script.js"></script>
+    
+
+</body>
+</html>
+</body>
+</html>

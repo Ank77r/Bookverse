@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Void Walker | Reader</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Crimson+Pro:ital,wght@0,300;0,400;0,600;1,400&family=Lato:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+    <div class="platform-container">
+        
+        <aside class="sidebar">
+            <div class="brand-area">
+                <i class="fas fa-dragon logo-icon"></i>
+                <h2 class="brand-text">The Void Walker</h2>
+            </div>
+
+            <div class="nav-header">
+                <a href="../index.html" class="back-link">
+                    <i class="fas fa-arrow-left"></i> <span class="back-text">Back to Home</span>
+                </a>
+            </div>
+
+            <ul id="chapter-list" class="chapter-nav"></ul>
+        </aside>
+
+        <main class="main-stage">
+            
+            <header class="toolbar">
+                <button id="toggle-sidebar" class="tool-btn"><i class="fas fa-stream"></i></button>
+                <div class="tool-group right">
+                    <button id="settings-btn" class="tool-btn"><i class="fas fa-cog"></i></button>
+                    <div class="settings-panel" id="settings-panel">
+                        <div class="setting-row">
+                            <label>Font Size</label>
+                            <input type="range" id="font-size-slider" min="16" max="26" value="20">
+                        </div>
+                        <div class="setting-row">
+                            <label>Theme</label>
+                            <div class="theme-toggles">
+                                <button class="theme-dot dark active" data-theme="dark"></button>
+                                <button class="theme-dot light" data-theme="light"></button>
+                                <button class="theme-dot sepia" data-theme="sepia"></button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <div class="scroll-container" id="scroll-container">
+                
+                <div class="chapter-hero">
+                    <div class="hero-content">
+                        <span class="chapter-kicker" id="chapter-num">Loading...</span>
+                        <h1 class="chapter-headline" id="chapter-title">Please Wait</h1>
+                        <div class="hero-divider"></div>
+                    </div>
+                </div>
+
+                <article class="manuscript-body">
+                    <div id="chapter-content" class="story-text skeleton-text">
+                        <div class="skeleton-line"></div>
+                        <div class="skeleton-line"></div>
+                        <div class="skeleton-line short"></div>
+                    </div>
+                </article>
+
+                <footer class="story-footer">
+                    <button id="prev-btn" class="nav-large-btn">Previous</button>
+                    <button id="next-btn" class="nav-large-btn primary">Next Chapter</button>
+                </footer>
+
+                <section class="reader-voices-section">
+                    <div class="voices-header">
+                        <h2 class="voices-title">Reader Voices</h2>
+                        <p class="voices-subtitle">Share your thoughts on this chapter</p>
+                    </div>
+
+                    <div class="voice-composer" id="voice-composer">
+                        <div class="composer-inner">
+                            <div class="composer-dot"></div>
+                            <textarea 
+                                id="comment-box" 
+                                placeholder="What's on your mind?" 
+                                class="voice-textarea"
+                                rows="3"></textarea>
+                            <div class="composer-actions">
+                                <button id="post-comment-btn" type="button" class="voice-submit">Share Voice</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="comments-list" class="voices-thread">
+                        <div class="voices-empty">No voices yet. Start the conversation.</div>
+                    </div>
+                </section>
+
+        </main>
+    </div>
+    
+    <script type="module" src="script.js"></script>
+
+</body>
+</html>
