@@ -3,122 +3,307 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BookVerse | Publisher Studio</title>
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <title>BookVerse Publisher | Console Access</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Playfair+Display:ital,wght@0,600;1,600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        /* --- CORE STYLES --- */
+        :root {
+            --bg-dark: #02040a;
+            --bg-panel: #090c14;
+            --primary: #fbbf24;
+            --success: #10b981;
+            --text-main: #ffffff;
+            --text-muted: #64748b;
+            --border: rgba(255, 255, 255, 0.06);
+            --glass: rgba(255, 255, 255, 0.02);
+            --ease: cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        * { box-sizing: border-box; }
+
         body {
-            background-color: #020617; color: #fff; font-family: 'Inter', sans-serif;
-            display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0;
-            background-image: radial-gradient(circle at center, #1e293b 0%, #020617 100%);
-        }
-        
-        .hub-card {
-            background: #0f172a; padding: 50px; border-radius: 20px; 
-            border: 1px solid rgba(255,255,255,0.1);
-            text-align: center; max-width: 480px; width: 90%;
-            box-shadow: 0 25px 50px rgba(0,0,0,0.6);
-            position: relative; overflow: hidden;
+            margin: 0; padding: 0; height: 100vh; width: 100vw;
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            font-family: 'Inter', sans-serif;
+            overflow: hidden;
+            display: grid;
+            grid-template-columns: 1.2fr 1fr;
         }
 
-        .hub-icon {
-            font-size: 3.5rem; color: #fbbf24; margin-bottom: 25px;
-            filter: drop-shadow(0 0 20px rgba(251, 191, 36, 0.4));
+        /* --- 1. ALIVE VISUAL PANEL --- */
+        .visual-panel {
+            position: relative;
+            background: #000;
+            overflow: hidden;
+            display: flex; flex-direction: column; justify-content: space-between;
+            padding: 60px;
+            border-right: 1px solid var(--border);
+            z-index: 1;
         }
 
-        h1 { 
-            font-family: 'Cinzel', serif; color: #fff; margin: 0 0 15px; font-size: 2.2rem; 
-            text-transform: uppercase; letter-spacing: 2px;
+        /* Animated Aurora */
+        .aurora-bg {
+            position: absolute; inset: -50%; z-index: 0;
+            background: 
+                radial-gradient(circle at 50% 50%, rgba(60, 20, 0, 0.3), transparent 60%),
+                radial-gradient(circle at 20% 80%, rgba(20, 40, 60, 0.4), transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(251, 191, 36, 0.05), transparent 40%);
+            filter: blur(80px);
+            animation: auroraMove 20s infinite alternate linear;
+            opacity: 0.7;
+        }
+        @keyframes auroraMove {
+            0% { transform: rotate(0deg) scale(1); }
+            100% { transform: rotate(10deg) scale(1.1); }
         }
         
-        p { color: #94a3b8; margin-bottom: 35px; line-height: 1.6; font-size: 1rem; }
+        .noise-overlay {
+            position: absolute; inset: 0; z-index: 1;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.04'/%3E%3C/svg%3E");
+            opacity: 0.5; pointer-events: none;
+        }
+
+        /* Parallax Elements */
+        .parallax-layer { transition: transform 0.1s ease-out; z-index: 2; position: relative; }
+
+        .brand-seal {
+            display: flex; align-items: center; gap: 15px;
+            font-family: 'Playfair Display', serif; font-size: 1.5rem; letter-spacing: -0.5px;
+        }
+        .brand-seal i { color: var(--primary); }
+
+        .hero-text h1 {
+            font-family: 'Playfair Display', serif; font-size: 4rem; line-height: 1.1;
+            margin-bottom: 20px;
+            background: linear-gradient(180deg, #fff 0%, #94a3b8 100%);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        }
+        .hero-text p { font-size: 1.1rem; color: var(--text-muted); line-height: 1.6; }
+
+        .quote-box { border-left: 2px solid var(--primary); padding-left: 20px; }
+        .quote-box p { font-style: italic; color: #cbd5e1; margin: 0 0 10px; }
+        .quote-box span { font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; color: var(--primary); text-transform: uppercase; }
+
+        /* --- 2. ALIVE TERMINAL PANEL --- */
+        .terminal-panel {
+            background: var(--bg-panel);
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            padding: 40px; position: relative; z-index: 2;
+        }
+
+        /* Scanline Effect */
+        .terminal-panel::before {
+            content: " "; display: block; position: absolute; top: 0; left: 0; bottom: 0; right: 0;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.1) 50%);
+            background-size: 100% 4px; z-index: 0; pointer-events: none;
+        }
+
+        .tech-grid {
+            position: absolute; inset: 0;
+            background-image: 
+                linear-gradient(var(--border) 1px, transparent 1px),
+                linear-gradient(90deg, var(--border) 1px, transparent 1px);
+            background-size: 60px 60px;
+            opacity: 0.3;
+            mask-image: radial-gradient(circle at center, black 40%, transparent 80%);
+            pointer-events: none;
+        }
+
+        .console-container {
+            width: 100%; max-width: 420px; position: relative; z-index: 5;
+            background: rgba(9, 12, 20, 0.8); backdrop-filter: blur(10px);
+            padding: 40px; border-radius: 20px; border: 1px solid var(--border);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+        }
+
+        .console-header h2 { font-size: 1.8rem; margin: 0 0 8px; font-weight: 600; }
+        .console-header p { color: var(--text-muted); margin: 0; font-size: 0.95rem; }
+
+        /* Typing Effect Area */
+        .status-line {
+            display: flex; align-items: center; gap: 10px;
+            font-family: 'JetBrains Mono', monospace; font-size: 0.8rem;
+            color: var(--text-muted); margin: 30px 0;
+            background: rgba(0,0,0,0.3); padding: 10px 14px; border-radius: 6px;
+            border: 1px solid var(--border);
+        }
+        .status-dot { width: 8px; height: 8px; background: #64748b; border-radius: 50%; transition: 0.3s; }
+        .status-dot.active { background: var(--success); box-shadow: 0 0 8px var(--success); }
+        .status-dot.warn { background: var(--primary); box-shadow: 0 0 8px var(--primary); }
         
-        /* --- BUTTONS (FORCED VISIBILITY) --- */
+        /* Blinking Cursor */
+        .typing-cursor::after {
+            content: '|'; animation: blink 1s step-start infinite; color: var(--primary);
+        }
+        @keyframes blink { 50% { opacity: 0; } }
+
+        /* --- VISUAL ICON & SCANNING EFFECT --- */
+        .visual-icon {
+            font-size: 2.5rem; margin-bottom: 20px;
+            background: linear-gradient(135deg, #fff 0%, #64748b 100%);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            position: relative; overflow: hidden; /* Contains the laser */
+            display: inline-block;
+        }
+
+        /* The Laser Beam */
+        .visual-icon::after {
+            content: '';
+            position: absolute;
+            top: -50%; left: 0; width: 100%; height: 10px;
+            background: linear-gradient(180deg, transparent, #10b981, transparent);
+            box-shadow: 0 0 15px #10b981;
+            opacity: 0;
+            transition: opacity 0.2s;
+            pointer-events: none;
+        }
+
+        /* Scanning Activation */
+        .visual-icon.scanning::after {
+            opacity: 1;
+            animation: scanBiometric 1.2s ease-in-out infinite;
+        }
+        .visual-icon.scanning i {
+            animation: flashIcon 0.5s infinite alternate;
+        }
+
+        @keyframes scanBiometric {
+            0% { top: -20%; }
+            100% { top: 120%; }
+        }
+        @keyframes flashIcon {
+            0% { opacity: 0.5; color: #10b981; }
+            100% { opacity: 1; color: #fff; text-shadow: 0 0 10px #10b981; }
+        }
+
+        /* Action Cards */
+        .action-card {
+            display: none; animation: fadeInUp 0.5s var(--ease) forwards;
+        }
+        .action-card.active { display: block; }
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* Buttons */
         .btn {
             display: flex; justify-content: center; align-items: center; gap: 10px;
-            width: 100%; padding: 16px; margin-bottom: 15px;
-            font-weight: 700; border-radius: 12px; cursor: pointer; 
-            text-decoration: none; transition: 0.3s; font-size: 1rem;
-            border: 2px solid transparent; 
-            box-sizing: border-box; /* Ensure padding doesn't break layout */
+            width: 100%; padding: 14px; margin-top: 10px;
+            border-radius: 8px; font-weight: 600; font-size: 0.95rem;
+            cursor: pointer; text-decoration: none; transition: 0.2s;
+            border: 1px solid transparent;
         }
-        
-        .btn-primary {
-            background-color: #fbbf24 !important; /* Force Gold */
-            color: #020617 !important;            /* Force Black Text */
-            border-color: #fbbf24 !important;
-            box-shadow: 0 0 25px rgba(251, 191, 36, 0.3);
-        }
-        .btn-primary:hover { 
-            background-color: #fff !important; 
-            border-color: #fff !important;
-            transform: translateY(-3px); 
-        }
-        
-        .btn-secondary {
-            background: transparent !important; 
-            border: 1px solid #334155 !important; 
-            color: #94a3b8 !important;
-        }
-        .btn-secondary:hover { 
-            border-color: #fff !important; 
-            color: #fff !important; 
-        }
+        .btn-primary { background: #fff; color: #000; }
+        .btn-primary:hover { background: #e2e8f0; transform: translateY(-1px); }
+        .btn-outline { background: transparent; color: var(--text-muted); border-color: var(--border); }
+        .btn-outline:hover { border-color: #fff; color: #fff; }
 
-        /* STATES */
-        .hidden { display: none !important; }
-        
-        /* SPINNER */
-        .loader {
-            width: 20px; height: 20px; border: 3px solid #020617;
-            border-bottom-color: transparent; border-radius: 50%;
-            animation: spin 1s linear infinite; display: none;
+        .btn-loader {
+            width: 16px; height: 16px; border: 2px solid #000;
+            border-right-color: transparent; border-radius: 50%;
+            animation: spin 0.8s linear infinite; display: none;
         }
+        .btn.loading .btn-loader { display: block; }
+        .btn.loading span { display: none; }
         @keyframes spin { to { transform: rotate(360deg); } }
-        
-        .btn-primary.loading .loader { display: block; }
-        .btn-primary.loading span { display: none; }
+
+        @media (max-width: 900px) {
+            body { grid-template-columns: 1fr; }
+            .visual-panel { display: none; }
+            .terminal-panel { padding: 20px; }
+        }
     </style>
 </head>
 <body>
 
-    <div class="hub-card">
-        <div class="hub-icon"><i class="fas fa-feather-alt"></i></div>
-        <h1>Publisher Studio</h1>
+    <div class="visual-panel" id="visualPanel">
+        <div class="aurora-bg"></div>
+        <div class="noise-overlay"></div>
         
-        <div id="loading-state">
-            <p>Connecting to servers...</p>
+        <div class="brand-seal parallax-layer" data-depth="0.05">
+            <i class="fas fa-feather-alt"></i> <span>BookVerse Studio</span>
         </div>
 
-        <div id="state-guest" class="hidden">
-            <p>You must be signed in to access the Creator Studio.</p>
-            <a href="index.html" class="btn btn-primary">Sign In</a>
+        <div class="hero-text parallax-layer" data-depth="0.1">
+            <h1>Where Stories <br>Become Legends.</h1>
+            <p>The backend terminal for creators. Manage manuscripts, analyze readership, and publish to the global network.</p>
         </div>
 
-        <div id="state-reader" class="hidden">
-            <p>Join our elite group of storytellers. Submit your application to become a verified author.</p>
-            
-            <button id="apply-btn" class="btn btn-primary">
-                <span>Request Author Access</span>
-                <div class="loader"></div>
-            </button>
-            
-            <a href="index.html" class="btn btn-secondary">Cancel</a>
+        <div class="quote-box parallax-layer" data-depth="0.05">
+            <p>"There is no greater agony than bearing an untold story inside you."</p>
+            <span>- Maya Angelou</span>
         </div>
+    </div>
 
-        <div id="state-pending" class="hidden">
-            <div style="font-size: 3rem; margin-bottom: 20px;">⏳</div>
-            <h3 style="color:#fbbf24; margin:0 0 10px;">Review In Progress</h3>
-            <p>Your request has been sent! An admin will approve you shortly.</p>
-            <a href="index.html" class="btn btn-secondary">Back to Home</a>
+    <div class="terminal-panel">
+        <div class="tech-grid"></div>
+
+        <div class="console-container">
+            <div class="console-header">
+                <h2>Console Access</h2>
+                <p>Identify yourself to enter the studio.</p>
+            </div>
+
+            <div class="status-line">
+                <div class="status-dot" id="system-dot"></div>
+                <span id="system-msg" class="typing-cursor">Initializing...</span>
+            </div>
+
+            <div id="state-loading" class="action-card active">
+                <div class="visual-icon"><i class="fas fa-circle-notch fa-spin"></i></div>
+            </div>
+
+            <div id="state-guest" class="action-card">
+                <div class="visual-icon"><i class="fas fa-lock"></i></div>
+                <h3 style="color:#fff; margin:0 0 10px;">Restricted Area</h3>
+                <p style="color:var(--text-muted); margin-bottom:25px; font-size:0.9rem;">
+                    Authentication token missing. Please sign in.
+                </p>
+                <a href="index.html" class="btn btn-primary">Sign In</a>
+                <a href="index.html" class="btn btn-outline">Exit Console</a>
+            </div>
+
+            <div id="state-reader" class="action-card">
+                <div class="visual-icon"><i class="fas fa-user-shield"></i></div>
+                <h3 style="color:#fff; margin:0 0 10px;">Author Access Required</h3>
+                <p style="color:var(--text-muted); margin-bottom:25px; font-size:0.9rem;">
+                    Account role 'READER' detected. Request elevation?
+                </p>
+                <button id="apply-btn" class="btn btn-primary">
+                    <span>Request Access</span>
+                    <div class="btn-loader"></div>
+                </button>
+                <a href="index.html" class="btn btn-outline">Cancel</a>
+            </div>
+
+            <div id="state-pending" class="action-card">
+                <div class="visual-icon" style="color:var(--primary);"><i class="fas fa-hourglass-half"></i></div>
+                <h3 style="color:#fff; margin:0 0 10px;">Application Pending</h3>
+                <p style="color:var(--text-muted); margin-bottom:25px; font-size:0.9rem;">
+                    Administrator review in progress. Stand by.
+                </p>
+                <a href="index.html" class="btn btn-outline">Return Home</a>
+            </div>
+
+            <div id="state-author" class="action-card">
+                <div id="fingerprint-container" class="visual-icon" style="color:#10b981;">
+                    <i class="fas fa-fingerprint"></i>
+                </div>
+                
+                <h3 id="auth-title" style="color:#fff; margin:0 0 10px;">Identity Verified</h3>
+                <p id="auth-desc" style="color:var(--text-muted); margin-bottom:25px; font-size:0.9rem;">
+                    Identity confirmed. System ready for entry.
+                </p>
+                
+                <button id="enter-terminal-btn" class="btn btn-primary">
+                    <span>Enter Terminal</span>
+                    <i class="fas fa-arrow-right"></i>
+                </button>
+            </div>
+
         </div>
-
-        <div id="state-author" class="hidden">
-            <div style="font-size: 3rem; margin-bottom: 20px;">✨</div>
-            <h3 style="color:#fbbf24; margin:0 0 10px;">Welcome, Creator</h3>
-            <p>Your studio is ready. Go forth and write.</p>
-            <a href="admin.html" class="btn btn-primary">Open Admin Panel</a>
+        
+        <div style="position:absolute; bottom:20px; color:var(--text-muted); font-size:0.75rem; font-family:'JetBrains Mono';">
+            v2.4.0 • SECURE CONNECTION
         </div>
     </div>
 
@@ -127,62 +312,149 @@
         import { checkUserRole, requestAuthorAccess } from "./user-data.js";
         import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
-        // DOM Elements
+        // --- UI REFS ---
         const els = {
-            loading: document.getElementById('loading-state'),
+            sysDot: document.getElementById('system-dot'),
+            sysMsg: document.getElementById('system-msg'),
+            applyBtn: document.getElementById('apply-btn'),
+            // States
+            loading: document.getElementById('state-loading'),
             guest: document.getElementById('state-guest'),
             reader: document.getElementById('state-reader'),
             pending: document.getElementById('state-pending'),
             author: document.getElementById('state-author'),
-            applyBtn: document.getElementById('apply-btn')
         };
 
-        function showState(stateName) {
-            // Hide everything first
-            els.loading.classList.add('hidden');
-            els.guest.classList.add('hidden');
-            els.reader.classList.add('hidden');
-            els.pending.classList.add('hidden');
-            els.author.classList.add('hidden');
+        // --- PARALLAX EFFECT ---
+        document.addEventListener('mousemove', (e) => {
+            const layers = document.querySelectorAll('.parallax-layer');
+            const x = (window.innerWidth - e.pageX * 2) / 100;
+            const y = (window.innerHeight - e.pageY * 2) / 100;
 
-            // Show target
-            if(els[stateName]) els[stateName].classList.remove('hidden');
+            layers.forEach(layer => {
+                const speed = layer.getAttribute('data-depth');
+                const xPos = x * speed * 20; 
+                const yPos = y * speed * 20;
+                layer.style.transform = `translateX(${xPos}px) translateY(${yPos}px)`;
+            });
+        });
+
+        // --- TYPEWRITER EFFECT ---
+        let typeInterval;
+        function typeWriter(text, elementId, speed = 30) {
+            const element = document.getElementById(elementId);
+            element.innerHTML = "";
+            let i = 0;
+            clearInterval(typeInterval);
+            
+            typeInterval = setInterval(() => {
+                if (i < text.length) {
+                    element.innerHTML += text.charAt(i);
+                    i++;
+                } else {
+                    clearInterval(typeInterval);
+                }
+            }, speed);
         }
 
+        // --- SYSTEM STATUS ---
+        function setSystemStatus(msg, type) {
+            typeWriter(msg, 'system-msg');
+            els.sysDot.className = 'status-dot'; 
+            if(type === 'active') els.sysDot.classList.add('active');
+            if(type === 'warn') els.sysDot.classList.add('warn');
+        }
+
+        function showState(stateName) {
+            ['loading', 'guest', 'reader', 'pending', 'author'].forEach(key => {
+                els[key].classList.remove('active');
+            });
+            els[stateName].classList.add('active');
+        }
+
+        // --- AUTH CHECK ---
         onAuthStateChanged(auth, async (user) => {
             if (user) {
-                try {
-                    const role = await checkUserRole();
-                    console.log("Current User Role:", role);
-
-                    if (role === 'admin' || role === 'author') {
-                        showState('author');
-                    } else if (role === 'pending') {
-                        showState('pending');
-                    } else {
+                setTimeout(async () => {
+                    setSystemStatus(`User: ${user.email} verified.`, 'active');
+                    try {
+                        const role = await checkUserRole();
+                        
+                        if (role === 'admin' || role === 'author') {
+                            showState('author');
+                            setSystemStatus("> Identity Verified: CREATOR", 'active');
+                        } else if (role === 'pending') {
+                            showState('pending');
+                            setSystemStatus("> Status: UNDER REVIEW", 'warn');
+                        } else {
+                            showState('reader');
+                            setSystemStatus("> Identity Verified: READER", 'active');
+                        }
+                    } catch (e) {
                         showState('reader');
                     }
-                } catch (e) {
-                    console.error("Role check failed:", e);
-                    showState('reader'); // Fallback
-                }
+                }, 800);
             } else {
-                showState('guest');
+                setTimeout(() => {
+                    showState('guest');
+                    setSystemStatus("> No active session found.", 'warn');
+                }, 800);
             }
         });
 
-        // Click Handler
+        // --- BUTTON ACTIONS ---
+        
+        // 1. Request Access
         if(els.applyBtn) {
             els.applyBtn.addEventListener('click', async () => {
                 els.applyBtn.classList.add('loading');
                 try {
                     await requestAuthorAccess();
                     showState('pending');
+                    setSystemStatus("> Application packet sent.", 'warn');
                 } catch (error) {
-                    console.error(error);
                     alert("Error: " + error.message);
                     els.applyBtn.classList.remove('loading');
                 }
+            });
+        }
+
+        // 2. BIOMETRIC SCAN LOGIC (New Feature)
+        const enterBtn = document.getElementById('enter-terminal-btn');
+        const fingerprint = document.getElementById('fingerprint-container');
+        const authTitle = document.getElementById('auth-title');
+        const authDesc = document.getElementById('auth-desc');
+
+        if(enterBtn) {
+            enterBtn.addEventListener('click', () => {
+                // Lock
+                enterBtn.style.pointerEvents = 'none';
+                enterBtn.innerHTML = `<div class="btn-loader"></div>`; 
+                enterBtn.classList.add('loading');
+
+                // Start Visuals
+                fingerprint.classList.add('scanning');
+                setSystemStatus("> INITIATING BIOMETRIC SCAN...", 'warn');
+                
+                authTitle.innerText = "Scanning Credentials...";
+                authTitle.style.color = "var(--primary)";
+                authDesc.innerText = "Verifying biometric signature hash...";
+
+                // Delay for effect
+                setTimeout(() => {
+                    fingerprint.classList.remove('scanning');
+                    
+                    authTitle.innerText = "ACCESS GRANTED";
+                    authTitle.style.color = "#10b981"; // Success Green
+                    authDesc.innerText = "Redirecting to secure console...";
+                    setSystemStatus("> AUTHENTICATION SUCCESSFUL.", 'active');
+
+                    // Redirect
+                    setTimeout(() => {
+                        window.location.href = 'admin.html';
+                    }, 800);
+
+                }, 2000);
             });
         }
     </script>

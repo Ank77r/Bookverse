@@ -20,6 +20,103 @@
         </div>
     </div>
 
+    <div class="book-preview-overlay" id="bookPreviewOverlay">
+        <div class="preview-backdrop-visual" id="previewBackdropVisual"></div>
+        
+        <div class="book-preview-modal saas-modal">
+            <button class="close-preview" id="closePreview">
+                <i class="fas fa-times"></i>
+            </button>
+
+            <div class="preview-layout">
+                <div class="preview-visual-col">
+                    <div class="preview-book-3d">
+                        <img id="previewCover" src="" alt="Book Cover" class="book-cover-img">
+                        <div class="book-spine"></div>
+                        <div class="book-shadow"></div>
+                    </div>
+                    <div class="preview-quick-actions">
+                        <button class="action-pill icon-only" title="Share"><i class="fas fa-share-alt"></i></button>
+                        <button class="action-pill icon-only" title="Add to Library"><i class="far fa-bookmark"></i></button>
+                    </div>
+                </div>
+
+                <div class="preview-content-col">
+                    <div class="preview-top-meta">
+                        <span class="meta-tag" id="previewGenre"><i class="fas fa-circle-notch"></i> Fantasy</span>
+                        <span class="meta-rating"><i class="fas fa-star text-gold"></i> <span id="previewRating">4.9</span> (2.4k)</span>
+                    </div>
+
+                    <h1 class="preview-title" id="previewTitle">Loading Title...</h1>
+                    
+                    <div class="preview-author-block">
+                        <div class="author-avatar-ring">
+                            <img id="previewAuthorImg" src="" alt="Author">
+                        </div>
+                        <div class="author-text">
+                            <span class="label">Created by</span>
+                            <h4 id="previewAuthor">Unknown Author</h4>
+                        </div>
+                    </div>
+
+                    <div class="saas-tabs-wrapper">
+                        <div class="saas-tabs-header">
+                            <div class="tab-item active" data-target="tab-overview">Overview</div>
+                            <div class="tab-item" data-target="tab-chapters">Chapters <span class="badge-mini" id="chapterCountBadge">0</span></div>
+                            <div class="tab-item" data-target="tab-details">Details</div>
+                            <div class="tab-indicator"></div>
+                        </div>
+
+                        <div class="saas-tabs-content">
+                            <div class="tab-pane active" id="tab-overview">
+                                <div class="preview-blurb-box custom-scroll">
+                                    <p id="previewBlurb">No description available.</p>
+                                </div>
+                                <div class="preview-stats-row">
+                                    <div class="stat-box">
+                                        <span class="val">24k</span>
+                                        <span class="lbl">Reads</span>
+                                    </div>
+                                    <div class="stat-box">
+                                        <span class="val">12h</span>
+                                        <span class="lbl">Read Time</span>
+                                    </div>
+                                    <div class="stat-box">
+                                        <span class="val">Completed</span>
+                                        <span class="lbl">Status</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="tab-pane" id="tab-chapters">
+                                <ul class="chapter-list-preview">
+                                    <li><span class="ch-num">01</span> The Beginning <span class="ch-time">15m</span></li>
+                                    <li><span class="ch-num">02</span> Into the Void <span class="ch-time">12m</span></li>
+                                    <li><span class="ch-num">03</span> Awakening <span class="ch-time">18m</span></li>
+                                </ul>
+                            </div>
+                            <div class="tab-pane" id="tab-details">
+                                <div class="coming-soon-state">
+                                    <i class="fas fa-hammer"></i>
+                                    <h4>Work in Progress</h4>
+                                    <p>Detailed metadata and statistics are coming soon.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="preview-footer-action">
+                        <button id="startReadingBtn" class="btn btn-xl btn-primary btn-block saas-main-btn">
+                            <span>Start Reading Now</span>
+                            <i class="fas fa-long-arrow-alt-right"></i>
+                            <div class="btn-shine"></div>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="search-overlay" id="searchOverlay">
         <div class="search-modal">
             <div class="search-header">
@@ -292,7 +389,6 @@
     </footer>
 
     <div id="toast-container"></div>
-    <!-- Custom Confirm Dialog -->
     <div id="custom-confirm-overlay" class="custom-confirm-overlay">
         <div class="custom-confirm-modal">
             <div class="custom-confirm-message" id="customConfirmMessage"></div>
@@ -308,8 +404,5 @@
     <script type="module" src="auth.js"></script>
     <script type="module" src="script.js"></script>
     
-
-</body>
-</html>
 </body>
 </html>

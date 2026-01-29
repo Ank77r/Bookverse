@@ -2,6 +2,30 @@
 import { db } from "./firebase-config.js";
 import { collection, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
+// --- CUSTOM CONFIRM DIALOG SYSTEM ---
+window.showCustomConfirm = function({ message, confirmText = "OK", cancelText = "Cancel", onConfirm, onCancel }) {
+    const overlay = document.getElementById('custom-confirm-overlay');
+    const msg = document.getElementById('customConfirmMessage');
+    const okBtn = document.getElementById('customConfirmOk');
+    const cancelBtn = document.getElementById('customConfirmCancel');
+    if (!overlay || !msg || !okBtn || !cancelBtn) return;
+    msg.textContent = message;
+    okBtn.textContent = confirmText;
+    cancelBtn.textContent = cancelText;
+    overlay.classList.add('active');
+    function cleanup() {
+        overlay.classList.remove('active');
+        okBtn.onclick = null;
+        cancelBtn.onclick = null;
+        document.onkeydown = null;
+    }
+    okBtn.onclick = () => { cleanup(); if (onConfirm) onConfirm(); };
+    cancelBtn.onclick = () => { cleanup(); if (onCancel) onCancel(); };
+    document.onkeydown = (e) => {
+        if (e.key === 'Escape') { cleanup(); if (onCancel) onCancel(); }
+    };
+};
+
 // --- GLOBAL TOAST NOTIFICATION SYSTEM ---
 window.showToast = (message, type = 'info') => {
     const container = document.getElementById('toast-container');
@@ -30,11 +54,10 @@ window.showToast = (message, type = 'info') => {
     }, 3500);
 };
 
-// ... (Rest of your existing script.js code below) ...
-
+// --- DOM READY INITIALIZATION ---
 document.addEventListener('DOMContentLoaded', () => {
     
-    // --- 1. STARDUST VORTEX LOADER (Original Code) ---
+    // --- 1. STARDUST VORTEX LOADER ---
     const loaderCanvas = document.getElementById('loader-canvas');
     const loaderCtx = loaderCanvas.getContext('2d');
     const preloader = document.getElementById('preloader');
@@ -150,12 +173,11 @@ document.addEventListener('DOMContentLoaded', () => {
         window.addEventListener('resize', () => { loaderCanvas.width = window.innerWidth; loaderCanvas.height = window.innerHeight; bgCanvas.width = window.innerWidth; bgCanvas.height = window.innerHeight; initBG(); });
     }
 
+    // --- UI TOGGLES (SEARCH / AUTH / THEME) ---
     const searchTrigger = document.getElementById('searchTrigger');
     const searchOverlay = document.getElementById('searchOverlay');
     const searchInput = document.getElementById('searchInput');
-    const searchDropdown = document.getElementById('searchDropdown');
-    const searchSpinner = document.getElementById('searchSpinner');
-    const searchClearBtn = document.getElementById('searchClearBtn');
+    
     const authTrigger = document.getElementById('signInTrigger') || document.querySelector('.btn-outline'); 
     const authOverlay = document.getElementById('authOverlay');
     const closeAuth = document.getElementById('closeAuth');
@@ -167,115 +189,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const phoneBtns = document.querySelectorAll('.btn-social.phone');
 
     if(searchTrigger && searchOverlay) {
-        searchTrigger.addEventListener('click', () => {
-            searchOverlay.classList.add('active');
-            setTimeout(() => searchInput.focus(), 100);
-        });
-        searchOverlay.addEventListener('click', (e) => {
-            if (e.target === searchOverlay) {
-                searchOverlay.classList.remove('active');
-                hideSearchDropdown();
-            }
-        });
-    }
-
-    // --- PREMIUM SEARCH FUNCTIONALITY ---
-    let searchResults = [];
-    let searchSelectedIndex = -1;
-    let searchTimeout = null;
-
-    function showSearchDropdown() {
-        if (searchDropdown) searchDropdown.classList.add('active');
-    }
-    function hideSearchDropdown() {
-        if (searchDropdown) searchDropdown.classList.remove('active');
-        searchSelectedIndex = -1;
-    }
-    function renderSearchResults(results) {
-        if (!searchDropdown) return;
-        if (!results.length) {
-            searchDropdown.innerHTML = '<div class="search-result-item" style="color:var(--text-muted);cursor:default;">No results found.</div>';
-            showSearchDropdown();
-            return;
-        }
-        searchDropdown.innerHTML = results.map((book, i) => `
-            <div class="search-result-item${i === searchSelectedIndex ? ' selected' : ''}" data-index="${i}">
-                <img class="search-result-cover" src="${book.cover}" alt="${book.title}">
-                <div class="search-result-meta">
-                    <div class="search-result-title">${book.title}</div>
-                    <div class="search-result-author">${book.author || ''}</div>
-                </div>
-            </div>
-        `).join('');
-        showSearchDropdown();
-    }
-    function doSearch(query) {
-        if (!query || !allBooks.length) {
-            searchResults = [];
-            renderSearchResults([]);
-            return;
-        }
-        const q = query.trim().toLowerCase();
-        searchResults = allBooks.filter(book =>
-            book.title.toLowerCase().includes(q) ||
-            (book.author && book.author.toLowerCase().includes(q))
-        ).slice(0, 8);
-        renderSearchResults(searchResults);
-    }
-    if (searchInput) {
-        searchInput.addEventListener('input', e => {
-            const val = e.target.value;
-            if (searchTimeout) clearTimeout(searchTimeout);
-            searchSpinner.parentElement.classList.toggle('loading', !!val);
-            if (!val) {
-                hideSearchDropdown();
-                searchSpinner.parentElement.classList.remove('loading');
-                return;
-            }
-            searchTimeout = setTimeout(() => {
-                doSearch(val);
-                searchSpinner.parentElement.classList.remove('loading');
-            }, 250);
-        });
-        searchInput.addEventListener('focus', () => {
-            if (searchInput.value) doSearch(searchInput.value);
-        });
-        searchInput.addEventListener('keydown', e => {
-            if (!searchResults.length) return;
-            if (e.key === 'ArrowDown') {
-                searchSelectedIndex = (searchSelectedIndex + 1) % searchResults.length;
-                renderSearchResults(searchResults);
-                e.preventDefault();
-            } else if (e.key === 'ArrowUp') {
-                searchSelectedIndex = (searchSelectedIndex - 1 + searchResults.length) % searchResults.length;
-                renderSearchResults(searchResults);
-                e.preventDefault();
-            } else if (e.key === 'Enter') {
-                if (searchSelectedIndex >= 0 && searchResults[searchSelectedIndex]) {
-                    window.location.href = `Fantasy-Novel/index.html?book=${searchResults[searchSelectedIndex].id}`;
-                }
-            } else if (e.key === 'Escape') {
-                hideSearchDropdown();
-            }
-        });
-    }
-    if (searchDropdown) {
-        searchDropdown.addEventListener('mousedown', e => {
-            const item = e.target.closest('.search-result-item');
-            if (item && item.dataset.index) {
-                const idx = parseInt(item.dataset.index);
-                if (searchResults[idx]) {
-                    window.location.href = `Fantasy-Novel/index.html?book=${searchResults[idx].id}`;
-                }
-            }
-        });
-    }
-    if (searchClearBtn) {
-        searchClearBtn.addEventListener('click', () => {
-            searchInput.value = '';
-            hideSearchDropdown();
-            searchInput.focus();
-        });
+        searchTrigger.addEventListener('click', () => { searchOverlay.classList.add('active'); setTimeout(() => searchInput.focus(), 100); });
+        searchOverlay.addEventListener('click', (e) => { if (e.target === searchOverlay) searchOverlay.classList.remove('active'); });
     }
 
     if(authTrigger) {
@@ -284,7 +199,6 @@ document.addEventListener('DOMContentLoaded', () => {
         authOverlay.addEventListener('click', (e) => { if (e.target === authOverlay) authOverlay.classList.remove('active'); });
         authTabs.forEach(tab => {
             tab.addEventListener('click', () => {
-                // Ensure Phone Form is hidden
                 if(phoneForm) phoneForm.style.display = 'none';
                 
                 authTabs.forEach(t => t.classList.remove('active'));
@@ -321,10 +235,25 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    // --- BOOK PREVIEW MODAL CLOSE LOGIC ---
+    const bookPreviewOverlay = document.getElementById('bookPreviewOverlay');
+    const closePreviewBtn = document.getElementById('closePreview');
+
+    if(closePreviewBtn && bookPreviewOverlay) {
+        closePreviewBtn.addEventListener('click', () => {
+            bookPreviewOverlay.classList.remove('active');
+        });
+        bookPreviewOverlay.addEventListener('click', (e) => {
+            if(e.target === bookPreviewOverlay) bookPreviewOverlay.classList.remove('active');
+        });
+    }
+
+    // GLOBAL ESCAPE KEY HANDLER
     document.addEventListener('keydown', (e) => {
         if (e.key === 'Escape') {
             if (searchOverlay.classList.contains('active')) searchOverlay.classList.remove('active');
             if (authOverlay.classList.contains('active')) authOverlay.classList.remove('active');
+            if (bookPreviewOverlay && bookPreviewOverlay.classList.contains('active')) bookPreviewOverlay.classList.remove('active');
         }
     });
 
@@ -373,6 +302,9 @@ document.addEventListener('DOMContentLoaded', () => {
             card.addEventListener('mouseleave', () => { card.style.transform = 'perspective(1000px) rotateX(0) rotateY(0) scale(1)'; });
         });
     }
+
+    // Initialize Search
+    initSearch();
 });
 
 // --- 3. DYNAMIC BOOK & HERO LOADER ---
@@ -397,28 +329,37 @@ async function loadBooks() {
             const data = doc.data();
             const cover = data.coverUrl || "https://via.placeholder.com/600x400?text=Book+Cover";
             
-            // Push to array for Hero Carousel
-            allBooks.push({
+            // Collect Data
+            const bookObj = {
                 id: doc.id,
-                title: data.title,
+                title: data.title || "Untitled Story",
+                author: data.author || "Unknown Author",
                 cover: cover,
-                chapters: data.chapters ? data.chapters.length : 0
-            });
+                chapters: data.chapters ? data.chapters.length : 0,
+                blurb: data.description || "Enter a world of imagination. No description has been added for this story yet.",
+                genre: data.genre || "Fantasy",
+                rating: data.rating || "New"
+            };
+
+            allBooks.push(bookObj);
 
             // Featured Grid Item
             const card = document.createElement('a');
-            card.href = `Fantasy-Novel/index.html?book=${doc.id}`;
+            card.href = "javascript:void(0)"; // Prevent default
             card.className = "bento-item tilt-card";
             card.style.height = "380px"; 
             
+            // Click Event to Open Modal
+            card.onclick = () => openBookPreview(bookObj);
+
             card.innerHTML = `
                 <div class="bento-bg" style="background-image: url('${cover}');"></div>
                 <div class="bento-overlay"></div>
                 <div class="bento-content">
-                    <span class="genre-tag fantasy">READ NOW</span>
-                    <h3>${data.title}</h3>
-                    <p class="bento-desc">${data.chapters ? data.chapters.length : 0} Chapters</p>
-                    <div class="card-meta"><span>View Story</span><span><i class="fas fa-arrow-right text-gold"></i></span></div>
+                    <span class="genre-tag fantasy">${bookObj.genre}</span>
+                    <h3>${bookObj.title}</h3>
+                    <p class="bento-desc">${bookObj.chapters} Chapters</p>
+                    <div class="card-meta"><span>Read Preview</span><span><i class="fas fa-arrow-right text-gold"></i></span></div>
                 </div>
             `;
             grid.appendChild(card);
@@ -434,7 +375,237 @@ async function loadBooks() {
     }
 }
 
-// --- 4. HERO CAROUSEL (SHUFFLE EFFECT) ---
+// --- 4. OPEN BOOK PREVIEW MODAL (ENHANCED SAAS LOGIC) ---
+function openBookPreview(book) {
+    const overlay = document.getElementById('bookPreviewOverlay');
+    
+    // Elements to populate
+    const backdrop = document.getElementById('previewBackdropVisual');
+    const pCover = document.getElementById('previewCover');
+    const pTitle = document.getElementById('previewTitle');
+    const pAuthor = document.getElementById('previewAuthor');
+    const pAuthorImg = document.getElementById('previewAuthorImg');
+    const pGenre = document.getElementById('previewGenre');
+    const pRating = document.getElementById('previewRating');
+    const pBlurb = document.getElementById('previewBlurb');
+    const badgeCount = document.getElementById('chapterCountBadge');
+    const startBtn = document.getElementById('startReadingBtn');
+    
+    if(!overlay) return;
+
+    // 1. POPULATE DATA
+    pCover.src = book.cover;
+    // Set dynamic blurred backdrop
+    if(backdrop) backdrop.style.backgroundImage = `url('${book.cover}')`;
+    
+    pTitle.textContent = book.title;
+    pAuthor.textContent = book.author;
+    if(pAuthorImg) pAuthorImg.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(book.author)}&background=random&color=fff`;
+    
+    if(pGenre) pGenre.innerHTML = `<i class="fas fa-circle-notch"></i> ${book.genre}`;
+    if(pRating) pRating.textContent = book.rating;
+    
+    if(pBlurb) pBlurb.textContent = book.blurb;
+    if(badgeCount) badgeCount.innerText = book.chapters;
+
+    // 2. RESET TABS TO "OVERVIEW"
+    const tabs = document.querySelectorAll('.tab-item');
+    const panes = document.querySelectorAll('.tab-pane');
+    const indicator = document.querySelector('.tab-indicator');
+    
+    // Reset active classes
+    tabs.forEach(t => t.classList.remove('active'));
+    panes.forEach(p => p.classList.remove('active'));
+    
+    // Set first tab active
+    if(tabs.length > 0) {
+        tabs[0].classList.add('active');
+        panes[0].classList.add('active');
+        // Initial indicator position
+        updateTabIndicator(tabs[0], indicator);
+    }
+
+    // 3. TAB CLICK LOGIC (Reactive)
+    tabs.forEach(tab => {
+        tab.onclick = () => {
+            // Remove active from all
+            tabs.forEach(t => t.classList.remove('active'));
+            panes.forEach(p => p.classList.remove('active'));
+
+            // Activate clicked
+            tab.classList.add('active');
+            const targetId = tab.getAttribute('data-target');
+            document.getElementById(targetId).classList.add('active');
+
+            // Slide the underline indicator
+            updateTabIndicator(tab, indicator);
+        };
+    });
+
+    // 4. SET BUTTON ACTION
+    if(startBtn) {
+        startBtn.onclick = () => {
+            // Add a micro-interaction before navigating
+            startBtn.style.transform = "scale(0.95)";
+            setTimeout(() => {
+                 window.location.href = `Fantasy-Novel/index.html?book=${book.id}`;
+            }, 150);
+        };
+    }
+
+    // 5. SHOW MODAL
+    overlay.classList.add('active');
+}
+
+// Helper to slide the tab indicator
+function updateTabIndicator(activeTab, indicator) {
+    if(!activeTab || !indicator) return;
+    // Wait for layout to ensure width is calculated
+    requestAnimationFrame(() => {
+        indicator.style.width = `${activeTab.offsetWidth}px`;
+        indicator.style.left = `${activeTab.offsetLeft}px`;
+    });
+}
+
+// --- 5. SEARCH FUNCTIONALITY (REINSTATED) ---
+// --- 5. SEARCH FUNCTIONALITY (WITH KEYBOARD NAVIGATION) ---
+function initSearch() {
+    const searchInput = document.getElementById('searchInput');
+    const searchDropdown = document.getElementById('searchDropdown');
+    const searchOverlay = document.getElementById('searchOverlay');
+    const clearBtn = document.getElementById('searchClearBtn');
+    const searchContainer = document.querySelector('.search-bar-premium');
+
+    let selectedIndex = -1; // Track keyboard selection
+
+    if (!searchInput || !searchDropdown) return;
+
+    // A. Event Listener for Typing
+    searchInput.addEventListener('input', (e) => {
+        const query = e.target.value.toLowerCase().trim();
+        
+        // Reset selection on new input
+        selectedIndex = -1; 
+
+        // UI: Show loading spinner briefly
+        if(searchContainer) {
+            searchContainer.classList.add('loading');
+            setTimeout(() => searchContainer.classList.remove('loading'), 300);
+        }
+
+        if (query.length === 0) {
+            searchDropdown.innerHTML = '';
+            searchDropdown.classList.remove('active');
+            return;
+        }
+
+        const results = allBooks.filter(book => {
+            const titleMatch = book.title.toLowerCase().includes(query);
+            const authorMatch = book.author.toLowerCase().includes(query);
+            const genreMatch = book.genre.toLowerCase().includes(query);
+            return titleMatch || authorMatch || genreMatch;
+        });
+
+        renderSearchResults(results);
+    });
+
+    // B. Keyboard Navigation Listener (Arrow Keys & Enter)
+    searchInput.addEventListener('keydown', (e) => {
+        // Get all currently visible result items
+        const items = searchDropdown.querySelectorAll('.search-result-item');
+        if (items.length === 0) return;
+
+        if (e.key === 'ArrowDown') {
+            e.preventDefault(); // Stop cursor moving in input
+            selectedIndex++;
+            if (selectedIndex >= items.length) selectedIndex = 0; // Loop to top
+            updateSelection(items);
+        } 
+        else if (e.key === 'ArrowUp') {
+            e.preventDefault();
+            selectedIndex--;
+            if (selectedIndex < 0) selectedIndex = items.length - 1; // Loop to bottom
+            updateSelection(items);
+        } 
+        else if (e.key === 'Enter') {
+            e.preventDefault();
+            if (selectedIndex > -1 && items[selectedIndex]) {
+                items[selectedIndex].click(); // Trigger the click event
+            }
+        }
+    });
+
+    // Helper: Update Visual Classes
+    function updateSelection(items) {
+        items.forEach((item, index) => {
+            if (index === selectedIndex) {
+                item.classList.add('selected');
+                // Ensure the item is visible in the scroll area
+                item.scrollIntoView({ block: 'nearest' });
+            } else {
+                item.classList.remove('selected');
+            }
+        });
+    }
+
+    // C. Clear Button Logic
+    if(clearBtn) {
+        clearBtn.addEventListener('click', () => {
+            searchInput.value = '';
+            searchDropdown.classList.remove('active');
+            searchInput.focus();
+            selectedIndex = -1;
+        });
+    }
+
+    // D. Render Helper
+    function renderSearchResults(results) {
+        searchDropdown.innerHTML = ''; 
+        selectedIndex = -1; // Reset index on new render
+
+        if (results.length === 0) {
+            // Note: We use a different class here so keyboard nav doesn't select "No results"
+            searchDropdown.innerHTML = `
+                <div class="search-no-result" style="padding: 14px 22px; color: var(--text-muted); display: flex; align-items: center; gap: 10px;">
+                    <i class="far fa-sad-tear"></i> <span>No stories found.</span>
+                </div>`;
+            searchDropdown.classList.add('active');
+            return;
+        }
+
+        results.forEach((book, index) => {
+            const item = document.createElement('div');
+            item.className = 'search-result-item';
+            // Add mouse hover support to update index
+            item.onmouseenter = () => {
+                const allItems = searchDropdown.querySelectorAll('.search-result-item');
+                allItems.forEach(i => i.classList.remove('selected'));
+                item.classList.add('selected');
+                selectedIndex = index; // Sync mouse with keyboard
+            };
+
+            item.innerHTML = `
+                <img src="${book.cover}" class="search-result-cover" alt="cover">
+                <div class="search-result-meta">
+                    <div class="search-result-title">${book.title}</div>
+                    <div class="search-result-author">by ${book.author}</div>
+                </div>
+            `;
+
+            item.addEventListener('click', () => {
+                searchOverlay.classList.remove('active');
+                openBookPreview(book);
+            });
+
+            searchDropdown.appendChild(item);
+        });
+
+        searchDropdown.classList.add('active');
+    }
+}
+
+
+// --- 6. HERO CAROUSEL (SHUFFLE EFFECT) ---
 function initHeroCarousel() {
     // Need at least 1 book. If only 1, duplicate it so we can still shuffle
     if(allBooks.length === 1) allBooks.push(allBooks[0]);
@@ -463,7 +634,14 @@ function updateStackData() {
 
     // Set Front Card Data
     frontImg.src = currentBook.cover;
-    frontLink.href = `Fantasy-Novel/index.html?book=${currentBook.id}`;
+    
+    // Hero card opens Modal
+    frontLink.href = "javascript:void(0)";
+    frontLink.onclick = (e) => {
+        e.preventDefault();
+        openBookPreview(currentBook);
+    };
+
     if(badge) badge.innerText = `Trending #${heroIndex + 1}`;
 
     // Set Back Card Data (Pre-load the next image)
@@ -478,32 +656,34 @@ function performShuffle() {
 
     if (!backCard) return;
 
-    // 1. Add Animation Class to Back Card (It flies to front)
+    // 1. Add Animation Class to Back Card
     backCard.classList.add('shuffling');
 
-    // 2. Wait for animation to finish (1.2s defined in CSS)
+    // 2. Wait for animation to finish
     setTimeout(() => {
-        // --- THE MAGIC SWAP ---
-        
         // A. Update Logic Index
         heroIndex = (heroIndex + 1) % allBooks.length;
         const currentBook = allBooks[heroIndex];
         const nextIndex = (heroIndex + 1) % allBooks.length;
         const nextBook = allBooks[nextIndex];
 
-        // B. Instantly update the Front Card to match the card that just landed
+        // B. Instantly update the Front Card
         frontImg.src = currentBook.cover;
-        frontLink.href = `Fantasy-Novel/index.html?book=${currentBook.id}`;
+        
+        frontLink.onclick = (e) => {
+            e.preventDefault();
+            openBookPreview(currentBook);
+        };
+
         if(badge) badge.innerText = `Trending #${heroIndex + 1}`;
 
-        // C. Remove Animation (Back card instantly snaps back to start position)
-        // Since Front card now shows the same image, user won't see the snap
+        // C. Remove Animation
         backCard.classList.remove('shuffling');
 
-        // D. Update Back card with the NEW next book
+        // D. Update Back card
         backCard.style.backgroundImage = `url('${nextBook.cover}')`;
 
-    }, 1200); // Must match CSS animation duration
+    }, 1200); 
 }
 
 // Start everything
