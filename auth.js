@@ -22,7 +22,11 @@ googleBtns.forEach(btn => {
             window.showToast(`Welcome back, ${result.user.displayName}!`, "success");
         } catch (error) {
             console.error("Google Login Error:", error);
-            window.showToast(error.message, "error");
+            if (error.code === 'auth/unauthorized-domain') {
+                window.showToast("Domain not authorized. Add to Firebase Console.", "error");
+            } else {
+                window.showToast(error.message, "error");
+            }
         }
     });
 });
