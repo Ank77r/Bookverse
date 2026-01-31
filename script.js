@@ -338,7 +338,8 @@ async function loadBooks() {
                 chapters: data.chapters ? data.chapters.length : 0,
                 blurb: data.description || "Enter a world of imagination. No description has been added for this story yet.",
                 genre: data.genre || "Fantasy",
-                rating: data.rating || "New"
+                rating: data.rating || "New",
+                reads: data.reads || 0 // Add reads property
             };
 
             allBooks.push(bookObj);
@@ -350,7 +351,11 @@ async function loadBooks() {
             card.style.height = "380px"; 
             
             // Click Event to Open Modal
-            card.onclick = () => openBookPreview(bookObj);
+            card.onclick = () => {
+                openBookPreview(bookObj);
+                bookObj.reads += 1; // Increment reads count dynamically
+                updateReadsCount(bookObj.id, bookObj.reads); // Update reads count in the database
+            };
 
             card.innerHTML = `
                 <div class="bento-bg" style="background-image: url('${cover}');"></div>
@@ -408,6 +413,17 @@ function openBookPreview(book) {
     if(pBlurb) pBlurb.textContent = book.blurb;
     if(badgeCount) badgeCount.innerText = book.chapters;
 
+    // Populate metadata in the details tab
+    const metaAuthor = document.getElementById('metaAuthor');
+    const metaLastUpdated = document.getElementById('metaLastUpdated');
+    const metaPublishedDate = document.getElementById('metaPublishedDate');
+    const metaChapters = document.getElementById('metaChapters');
+
+    if(metaAuthor) metaAuthor.textContent = book.author;
+    if(metaLastUpdated) metaLastUpdated.textContent = book.lastUpdated || 'N/A';
+    if(metaPublishedDate) metaPublishedDate.textContent = book.publishedDate || 'N/A';
+    if(metaChapters) metaChapters.textContent = book.chapters;
+
     // 2. RESET TABS TO "OVERVIEW"
     const tabs = document.querySelectorAll('.tab-item');
     const panes = document.querySelectorAll('.tab-pane');
@@ -455,6 +471,11 @@ function openBookPreview(book) {
 
     // 5. SHOW MODAL
     overlay.classList.add('active');
+
+    // Update dynamic reads display
+    if (document.getElementById('dynamicReads')) {
+        document.getElementById('dynamicReads').textContent = book.reads.toLocaleString();
+    }
 }
 
 // Helper to slide the tab indicator
@@ -684,6 +705,18 @@ function performShuffle() {
         backCard.style.backgroundImage = `url('${nextBook.cover}')`;
 
     }, 1200); 
+}
+
+// Function to update reads count in the database
+async function updateReadsCount(bookId, reads) {
+    try {
+        // Assuming a Firebase setup
+        const bookRef = firebase.firestore().collection('books').doc(bookId);
+        await bookRef.update({ reads });
+        console.log(`Reads count updated for book ID: ${bookId}`);
+    } catch (error) {
+        console.error("Error updating reads count:", error);
+    }
 }
 
 // Start everything
