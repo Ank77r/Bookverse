@@ -316,10 +316,11 @@
             width: 100%; max-width: 550px; padding: 40px; border-radius: 24px;
             box-shadow: 0 50px 100px -20px rgba(0,0,0,0.7); 
             transform: translateY(20px) scale(0.95); transition: 0.4s cubic-bezier(0.19, 1, 0.22, 1);
+            position: relative;
         }
         .modal-overlay.active .modal-glass { transform: translateY(0) scale(1); }
 
-        .form-group label { display: block; color: var(--text-muted); font-size: 0.8rem; margin-bottom: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; }
+        .form-group label { display: flex; justify-content: space-between; color: var(--text-muted); font-size: 0.8rem; margin-bottom: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; }
         .form-input {
             width: 100%; background: #1e293b; border: 1px solid var(--border);
             padding: 16px; border-radius: 12px; color: #fff; transition: 0.3s; 
@@ -327,6 +328,100 @@
         }
         .form-input:focus { border-color: var(--primary); background: #020617; box-shadow: 0 0 0 4px rgba(251, 191, 36, 0.1); }
         
+        /* Validation Styling */
+        .form-input.input-error {
+            border-color: var(--danger);
+            background: rgba(239, 68, 68, 0.05);
+            animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both;
+        }
+        .required-tag {
+            color: var(--danger);
+            font-size: 0.7rem;
+            display: none;
+        }
+        .form-input.input-error + .required-tag, 
+        .form-group:has(.input-error) .required-tag {
+            display: inline-block;
+        }
+
+        @keyframes shake {
+            10%, 90% { transform: translate3d(-1px, 0, 0); }
+            20%, 80% { transform: translate3d(2px, 0, 0); }
+            30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
+            40%, 60% { transform: translate3d(4px, 0, 0); }
+        }
+        
+        /* --- NEW TOASTS & ALERTS STYLES --- */
+        #toast-container {
+            position: fixed; top: 20px; right: 20px; z-index: 9999;
+            display: flex; flex-direction: column; gap: 10px;
+        }
+        
+        .toast {
+            background: #1e293b;
+            color: #fff;
+            padding: 16px 20px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            display: flex; align-items: center; gap: 12px;
+            min-width: 300px;
+            border-left: 4px solid var(--primary);
+            animation: slideInRight 0.3s ease forwards;
+            font-size: 0.95rem;
+        }
+        .toast.success { border-color: var(--success); }
+        .toast.error { border-color: var(--danger); }
+        .toast i { font-size: 1.2rem; }
+        .toast.success i { color: var(--success); }
+        .toast.error i { color: var(--danger); }
+        .toast.info i { color: var(--primary); }
+
+        @keyframes slideInRight {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        @keyframes slideOutRight {
+            to { transform: translateX(100%); opacity: 0; }
+        }
+
+        /* Custom Confirm Modal */
+        #custom-confirm-modal {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.85);
+            backdrop-filter: blur(5px); z-index: 4000;
+            display: none; justify-content: center; align-items: center;
+        }
+        .confirm-box {
+            background: #0f172a; border: 1px solid var(--border);
+            padding: 30px; border-radius: 16px;
+            max-width: 400px; width: 90%; text-align: center;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+            transform: scale(0.9); opacity: 0; transition: 0.2s;
+        }
+        #custom-confirm-modal.active .confirm-box { transform: scale(1); opacity: 1; }
+        
+        .confirm-icon {
+            width: 60px; height: 60px; background: rgba(255,255,255,0.05);
+            border-radius: 50%; margin: 0 auto 20px;
+            display: grid; place-items: center; font-size: 1.5rem; color: var(--primary);
+        }
+        .confirm-title { font-size: 1.25rem; font-weight: 600; color: #fff; margin-bottom: 10px; }
+        .confirm-desc { color: var(--text-muted); font-size: 0.95rem; margin-bottom: 25px; line-height: 1.5; }
+        
+        .confirm-actions { display: flex; gap: 10px; justify-content: center; }
+        .btn-cancel {
+            background: transparent; border: 1px solid var(--border); color: #fff;
+            padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: 600;
+            transition: 0.2s;
+        }
+        .btn-cancel:hover { background: rgba(255,255,255,0.05); }
+        
+        .btn-confirm {
+            background: var(--primary); color: #000;
+            padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: 600; border: none;
+            transition: 0.2s;
+        }
+        .btn-confirm:hover { transform: translateY(-2px); box-shadow: 0 5px 15px var(--primary-glow); }
+
         /* Mobile */
         @media (max-width: 1000px) {
             .app-layout { grid-template-columns: 80px 1fr; }
@@ -453,7 +548,7 @@
             <input type="hidden" id="modal-book-id">
             
             <div class="form-group">
-                <label>Title</label>
+                <label>Title <span class="required-tag">* Required</span></label>
                 <input type="text" id="input-book-title" class="form-input" placeholder="e.g. The Last Horizon">
             </div>
             
@@ -470,7 +565,7 @@
                     </select>
                 </div>
                 <div class="form-group">
-                    <label>Cover Image URL</label>
+                    <label>Cover Image URL <span class="required-tag">* Required</span></label>
                     <input type="text" id="input-book-cover" class="form-input" placeholder="https://...">
                 </div>
             </div>
@@ -509,6 +604,20 @@
         </div>
     </div>
 
+    <div id="toast-container"></div>
+    
+    <div id="custom-confirm-modal">
+        <div class="confirm-box">
+            <div class="confirm-icon" id="confirm-icon"><i class="fas fa-question"></i></div>
+            <h3 class="confirm-title" id="confirm-title">Are you sure?</h3>
+            <p class="confirm-desc" id="confirm-message">This action cannot be undone.</p>
+            <div class="confirm-actions">
+                <button class="btn-cancel" onclick="window.closeConfirm()">Cancel</button>
+                <button class="btn-confirm" id="btn-confirm-action">Confirm</button>
+            </div>
+        </div>
+    </div>
+
     <script type="module">
         import { db, auth } from "./firebase-config.js";
         import { doc, getDoc, setDoc, updateDoc, deleteDoc, collection, getDocs, query, where, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
@@ -518,6 +627,63 @@
         let currentBookId = null;
         let currentBookData = null;
         let editingIndex = null;
+
+        // --- NEW NOTIFICATION & CONFIRMATION LOGIC ---
+
+        // Toast Notification System
+        window.showToast = (message, type = 'info') => {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            
+            let icon = 'fa-info-circle';
+            if(type === 'success') icon = 'fa-check-circle';
+            if(type === 'error') icon = 'fa-exclamation-triangle';
+            
+            toast.innerHTML = `<i class="fas ${icon}"></i> <span>${message}</span>`;
+            
+            container.appendChild(toast);
+            
+            // Remove after 3 seconds with animation
+            setTimeout(() => {
+                toast.style.animation = 'slideOutRight 0.3s ease forwards';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        };
+
+        // Custom Confirm Modal Logic
+        let confirmCallback = null;
+        
+        window.showCustomConfirm = ({ message, title = "Confirmation", icon = "fa-question", confirmText = "Confirm", cancelText="Cancel", onConfirm }) => {
+            const modal = document.getElementById('custom-confirm-modal');
+            document.getElementById('confirm-title').innerText = title;
+            document.getElementById('confirm-message').innerText = message;
+            document.getElementById('confirm-icon').innerHTML = `<i class="fas ${icon}"></i>`;
+            
+            const btnConfirm = document.getElementById('btn-confirm-action');
+            btnConfirm.innerText = confirmText;
+            document.querySelector('.btn-cancel').innerText = cancelText;
+
+            confirmCallback = onConfirm;
+            
+            modal.style.display = 'flex';
+            setTimeout(() => modal.classList.add('active'), 10);
+        };
+
+        window.closeConfirm = () => {
+            const modal = document.getElementById('custom-confirm-modal');
+            modal.classList.remove('active');
+            setTimeout(() => {
+                modal.style.display = 'none';
+                confirmCallback = null;
+            }, 200);
+        };
+
+        document.getElementById('btn-confirm-action').onclick = () => {
+            if (confirmCallback) confirmCallback();
+            window.closeConfirm();
+        };
+
 
         // HELPER: Get Display Name STRICTLY
         const getAuthorName = (userData) => {
@@ -631,18 +797,43 @@
         }
 
         window.decideRequest = async (userId, newRole) => {
-            if(!confirm(`Set user role to ${newRole.toUpperCase()}?`)) return;
-            try { await updateDoc(doc(db, "users", userId), { role: newRole }); await loadAdminRequests(); } catch (e) { alert("Error."); }
+            window.showCustomConfirm({
+                message: `Set user role to ${newRole.toUpperCase()}?`,
+                title: "Approve Role",
+                icon: "fa-user-cog",
+                confirmText: "Yes, Update",
+                onConfirm: async () => {
+                    try { 
+                        await updateDoc(doc(db, "users", userId), { role: newRole }); 
+                        await loadAdminRequests(); 
+                        window.showToast(`User approved as ${newRole}`, "success");
+                    }
+                    catch (e) { window.showToast("Error updating role.", "error"); }
+                }
+            });
         };
 
         window.claimAllBooks = async () => {
-            if(!confirm("Assign ALL books without owner to YOU?")) return;
-            const uid = auth.currentUser.uid;
-            const booksSnap = await getDocs(collection(db, "books"));
-            booksSnap.forEach(async (d) => {
-                if (!d.data().authorId) await updateDoc(doc(db, "books", d.id), { authorId: uid });
+            window.showCustomConfirm({
+                message: "Are you sure you want to take ownership of all unassigned books?",
+                title: "Claim Ownership",
+                icon: "fa-magic",
+                confirmText: "Yes, Claim All",
+                onConfirm: async () => {
+                    try {
+                        const uid = auth.currentUser.uid;
+                        const booksSnap = await getDocs(collection(db, "books"));
+                        let count = 0;
+                        booksSnap.forEach(async (d) => {
+                            if (!d.data().authorId) {
+                                await updateDoc(doc(db, "books", d.id), { authorId: uid });
+                                count++;
+                            }
+                        });
+                        window.showToast("Process initiated. Please refresh shortly.", "info");
+                    } catch(e) { window.showToast("Error claiming books", "error"); }
+                }
             });
-            alert(`Claiming books... please refresh shortly.`);
         };
 
         // --- 3. DASHBOARD ---
@@ -692,6 +883,9 @@
             const genreInput = document.getElementById('input-book-genre');
             const hiddenId = document.getElementById('modal-book-id');
 
+            // Reset Validations
+            document.querySelectorAll('.form-input').forEach(i => i.classList.remove('input-error'));
+
             titleInput.value = ""; coverInput.value = ""; descInput.value = ""; hiddenId.value = "";
 
             if (bookId) {
@@ -715,31 +909,80 @@
             setTimeout(() => modal.style.display = "none", 300);
         };
 
+        // --- FORM VALIDATION LOGIC ---
+        function validateInput(input) {
+            if(!input.value.trim()) {
+                input.classList.add('input-error');
+                // Remove animation class after it plays so it can be re-triggered
+                setTimeout(() => input.classList.remove('input-error'), 500);
+                // Keep visually red (handled by specific css for empty state if needed, or just let the animation handle focus)
+                input.classList.add('input-error'); 
+                return false;
+            }
+            input.classList.remove('input-error');
+            return true;
+        }
+
         document.getElementById('save-book-btn').addEventListener('click', async () => {
-            const title = document.getElementById('input-book-title').value;
-            const coverUrl = document.getElementById('input-book-cover').value;
-            const description = document.getElementById('input-book-desc').value;
-            const genre = document.getElementById('input-book-genre').value;
+            const titleInput = document.getElementById('input-book-title');
+            const coverInput = document.getElementById('input-book-cover');
+            const descInput = document.getElementById('input-book-desc');
+            const genreInput = document.getElementById('input-book-genre');
             const existingId = document.getElementById('modal-book-id').value;
 
-            if(!title) return alert("Title required");
+            // Validation Logic
+            let isValid = true;
+            if(!validateInput(titleInput)) isValid = false;
+            if(!validateInput(coverInput)) isValid = false;
 
-            const bookData = { title, coverUrl, description, genre };
-
-            if (existingId) {
-                await updateDoc(doc(db, "books", existingId), bookData);
-            } else {
-                const id = title.toLowerCase().replace(/[^a-z0-9]+/g, '-');
-                bookData.chapters = [];
-                bookData.authorId = auth.currentUser.uid;
-                bookData.createdAt = serverTimestamp();
-                await setDoc(doc(db, "books", id), bookData);
+            if(!isValid) {
+                window.showToast("Please fill in required fields", "error");
+                return;
             }
-            closeBookModal(); loadDashboard();
+
+            const bookData = { 
+                title: titleInput.value, 
+                coverUrl: coverInput.value, 
+                description: descInput.value, 
+                genre: genreInput.value 
+            };
+
+            try {
+                if (existingId) {
+                    await updateDoc(doc(db, "books", existingId), bookData);
+                    window.showToast("Book updated successfully", "success");
+                } else {
+                    const id = titleInput.value.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+                    bookData.chapters = [];
+                    bookData.authorId = auth.currentUser.uid;
+                    bookData.createdAt = serverTimestamp();
+                    await setDoc(doc(db, "books", id), bookData);
+                    window.showToast("Book created successfully", "success");
+                }
+                closeBookModal(); 
+                loadDashboard();
+            } catch(e) {
+                window.showToast("Error saving book", "error");
+                console.error(e);
+            }
         });
 
         window.deleteBook = async (id) => {
-            if(confirm("Delete this book?")) { await deleteDoc(doc(db, "books", id)); loadDashboard(); }
+            window.showCustomConfirm({
+                message: "Are you sure you want to delete this book? This cannot be undone.",
+                title: "Delete Book",
+                icon: "fa-trash",
+                confirmText: "Delete",
+                onConfirm: async () => {
+                    try {
+                        await deleteDoc(doc(db, "books", id)); 
+                        loadDashboard();
+                        window.showToast("Book deleted", "success");
+                    } catch(e) {
+                        window.showToast("Error deleting book", "error");
+                    }
+                }
+            });
         };
 
         // --- 5. EDITOR ---
@@ -783,20 +1026,28 @@
         document.getElementById('publish-chap-btn').addEventListener('click', async () => {
             const title = document.getElementById('chap-title').value;
             const content = document.getElementById('chap-content').value;
-            if(!title) return alert("Title required");
+            
+            if(!title) { window.showToast("Chapter title required", "error"); return; }
+            
             let newChapters = [...(currentBookData.chapters || [])];
             const chapData = { title, content };
             if (editingIndex !== null) newChapters[editingIndex] = chapData;
             else { newChapters.push(chapData); editingIndex = newChapters.length - 1; }
-            await updateDoc(doc(db, "books", currentBookId), { chapters: newChapters });
-            currentBookData.chapters = newChapters;
-            renderChapterList();
             
-            // Visual feedback
-            const btn = document.getElementById('publish-chap-btn');
-            const originalText = btn.innerHTML;
-            btn.innerHTML = '<i class="fas fa-check"></i> Saved!';
-            setTimeout(() => btn.innerHTML = originalText, 2000);
+            try {
+                await updateDoc(doc(db, "books", currentBookId), { chapters: newChapters });
+                currentBookData.chapters = newChapters;
+                renderChapterList();
+                
+                // Visual feedback
+                const btn = document.getElementById('publish-chap-btn');
+                const originalText = btn.innerHTML;
+                btn.innerHTML = '<i class="fas fa-check"></i> Saved!';
+                window.showToast("Chapter saved successfully", "success");
+                setTimeout(() => btn.innerHTML = originalText, 2000);
+            } catch(e) {
+                window.showToast("Error saving chapter", "error");
+            }
         });
     </script>
 </body>

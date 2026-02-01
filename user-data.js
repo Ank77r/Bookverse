@@ -59,7 +59,7 @@ export async function getProgress(bookId) {
 // 1. Request to become an Author
 export async function requestAuthorAccess() {
     const user = auth.currentUser;
-    if (!user) return alert("Please sign in first.");
+    if (!user) { window.showToast("Please sign in first.", "error"); return; }
 
     const userRef = doc(db, "users", user.uid);
     

@@ -29,33 +29,143 @@ window.showCustomConfirm = function({ message, confirmText = "OK", cancelText = 
 // --- GLOBAL TOAST NOTIFICATION SYSTEM ---
 window.showToast = (message, type = 'info') => {
     const container = document.getElementById('toast-container');
-    
     // Create Element
     const toast = document.createElement('div');
     toast.className = `toast ${type}`;
-    
     // Icon Selection
     let iconClass = 'fa-info-circle';
     if (type === 'success') iconClass = 'fa-check-circle';
     if (type === 'error') iconClass = 'fa-exclamation-circle';
-    
     toast.innerHTML = `
         <i class="fas ${iconClass}"></i>
         <span>${message}</span>
+        <button class="toast-close" title="Close" aria-label="Close"><i class="fas fa-times"></i></button>
     `;
-    
     // Add to DOM
     container.appendChild(toast);
-    
+    // Close button logic
+    const closeBtn = toast.querySelector('.toast-close');
+    if (closeBtn) {
+        closeBtn.onclick = () => {
+            toast.classList.add('hiding');
+            toast.addEventListener('animationend', () => toast.remove());
+        };
+    }
     // Remove after 3.5 seconds
     setTimeout(() => {
-        toast.classList.add('hiding');
-        toast.addEventListener('animationend', () => toast.remove());
+        if (toast.parentNode) {
+            toast.classList.add('hiding');
+            toast.addEventListener('animationend', () => toast.remove());
+        }
     }, 3500);
 };
 
 // --- DOM READY INITIALIZATION ---
 document.addEventListener('DOMContentLoaded', () => {
+        // --- PROFILE MENU LOGIC ---
+        import('./firebase-config.js').then(({ auth }) => {
+            import('https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js').then(({ onAuthStateChanged, signOut }) => {
+                const profileMenuContainer = document.getElementById('profileMenuContainer');
+                const profileBtn = document.getElementById('profileBtn');
+                const profileAvatar = document.getElementById('profileAvatar');
+                const profileDropdown = document.getElementById('profileDropdown');
+                const profileDropdownName = document.getElementById('profileDropdownName');
+                const profileDropdownEmail = document.getElementById('profileDropdownEmail');
+                const profileDropdownProfile = document.getElementById('profileDropdownProfile');
+                const profileDropdownLogout = document.getElementById('profileDropdownLogout');
+                const profileDropdownSwitch = document.getElementById('profileDropdownSwitch');
+                const profileDropdownNotifications = document.getElementById('profileDropdownNotifications');
+
+                let userData = null;
+
+                function showProfileMenu(show) {
+                    if (!profileMenuContainer) return;
+                    if (show) profileMenuContainer.classList.add('open');
+                    else profileMenuContainer.classList.remove('open');
+                }
+
+                // Toggle dropdown
+                if (profileBtn) {
+                    profileBtn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        if (profileMenuContainer.classList.contains('open')) showProfileMenu(false);
+                        else showProfileMenu(true);
+                    });
+                }
+                document.addEventListener('click', (e) => {
+                    if (!profileMenuContainer.contains(e.target)) showProfileMenu(false);
+                });
+
+                // Auth state
+                onAuthStateChanged(auth, (user) => {
+                    userData = user;
+                    if (user) {
+                        // Show avatar or initials
+                        if (user.photoURL) {
+                            profileAvatar.classList.remove('guest');
+                            profileAvatar.innerHTML = `<img src="${user.photoURL}" alt="Avatar">`;
+                        } else if (user.displayName) {
+                            const initials = user.displayName.split(' ').map(n => n[0]).join('').slice(0,2).toUpperCase();
+                            profileAvatar.classList.remove('guest');
+                            profileAvatar.textContent = initials;
+                        } else {
+                            profileAvatar.classList.remove('guest');
+                            profileAvatar.innerHTML = '<i class="fas fa-user"></i>';
+                        }
+                        profileDropdownName.textContent = user.displayName || 'User';
+                        profileDropdownEmail.textContent = user.email || '';
+                    } else {
+                        profileAvatar.classList.add('guest');
+                        profileAvatar.innerHTML = '<i class="fas fa-user"></i>';
+                        profileDropdownName.textContent = 'Guest';
+                        profileDropdownEmail.textContent = '';
+                    }
+                });
+
+                // Profile click
+                if (profileDropdownProfile) {
+                    profileDropdownProfile.addEventListener('click', () => {
+                        if (userData) {
+                            window.location.href = 'profile.html';
+                        } else {
+                            showProfileMenu(false);
+                            document.getElementById('authOverlay').classList.add('active');
+                        }
+                    });
+                }
+                // Notifications click
+                if (profileDropdownNotifications) {
+                    profileDropdownNotifications.addEventListener('click', () => {
+                        showProfileMenu(false);
+                        window.showToast('Notifications coming soon!', 'info');
+                    });
+                }
+                // Switch account
+                if (profileDropdownSwitch) {
+                    profileDropdownSwitch.addEventListener('click', () => {
+                        showProfileMenu(false);
+                        document.getElementById('authOverlay').classList.add('active');
+                    });
+                }
+                // Logout
+                if (profileDropdownLogout) {
+                    profileDropdownLogout.addEventListener('click', async () => {
+                        await signOut(auth);
+                        showProfileMenu(false);
+                        window.showToast('Signed out successfully.', 'success');
+                    });
+                }
+                // If guest, clicking avatar opens sign in
+                if (profileAvatar) {
+                    profileAvatar.addEventListener('click', () => {
+                        if (!userData) {
+                            showProfileMenu(false);
+                            document.getElementById('authOverlay').classList.add('active');
+                        }
+                    });
+                }
+            });
+        });
     
     // --- 1. STARDUST VORTEX LOADER ---
     const loaderCanvas = document.getElementById('loader-canvas');
@@ -338,8 +448,7 @@ async function loadBooks() {
                 chapters: data.chapters ? data.chapters.length : 0,
                 blurb: data.description || "Enter a world of imagination. No description has been added for this story yet.",
                 genre: data.genre || "Fantasy",
-                rating: data.rating || "New",
-                reads: data.reads || 0 // Add reads property
+                rating: data.rating || "New"
             };
 
             allBooks.push(bookObj);
@@ -351,11 +460,7 @@ async function loadBooks() {
             card.style.height = "380px"; 
             
             // Click Event to Open Modal
-            card.onclick = () => {
-                openBookPreview(bookObj);
-                bookObj.reads += 1; // Increment reads count dynamically
-                updateReadsCount(bookObj.id, bookObj.reads); // Update reads count in the database
-            };
+            card.onclick = () => openBookPreview(bookObj);
 
             card.innerHTML = `
                 <div class="bento-bg" style="background-image: url('${cover}');"></div>
@@ -413,17 +518,6 @@ function openBookPreview(book) {
     if(pBlurb) pBlurb.textContent = book.blurb;
     if(badgeCount) badgeCount.innerText = book.chapters;
 
-    // Populate metadata in the details tab
-    const metaAuthor = document.getElementById('metaAuthor');
-    const metaLastUpdated = document.getElementById('metaLastUpdated');
-    const metaPublishedDate = document.getElementById('metaPublishedDate');
-    const metaChapters = document.getElementById('metaChapters');
-
-    if(metaAuthor) metaAuthor.textContent = book.author;
-    if(metaLastUpdated) metaLastUpdated.textContent = book.lastUpdated || 'N/A';
-    if(metaPublishedDate) metaPublishedDate.textContent = book.publishedDate || 'N/A';
-    if(metaChapters) metaChapters.textContent = book.chapters;
-
     // 2. RESET TABS TO "OVERVIEW"
     const tabs = document.querySelectorAll('.tab-item');
     const panes = document.querySelectorAll('.tab-pane');
@@ -471,11 +565,6 @@ function openBookPreview(book) {
 
     // 5. SHOW MODAL
     overlay.classList.add('active');
-
-    // Update dynamic reads display
-    if (document.getElementById('dynamicReads')) {
-        document.getElementById('dynamicReads').textContent = book.reads.toLocaleString();
-    }
 }
 
 // Helper to slide the tab indicator
@@ -705,18 +794,6 @@ function performShuffle() {
         backCard.style.backgroundImage = `url('${nextBook.cover}')`;
 
     }, 1200); 
-}
-
-// Function to update reads count in the database
-async function updateReadsCount(bookId, reads) {
-    try {
-        // Assuming a Firebase setup
-        const bookRef = firebase.firestore().collection('books').doc(bookId);
-        await bookRef.update({ reads });
-        console.log(`Reads count updated for book ID: ${bookId}`);
-    } catch (error) {
-        console.error("Error updating reads count:", error);
-    }
 }
 
 // Start everything

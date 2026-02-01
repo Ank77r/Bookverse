@@ -234,7 +234,23 @@
                 <button class="icon-btn" id="searchTrigger" title="Search"><i class="fas fa-search"></i></button>
                 <button class="icon-btn" id="themeToggle" title="Switch Theme"><i class="fas fa-moon"></i></button>
                 <a href="publish-hub.html" class="btn btn-primary glow-effect"><i class="fas fa-pen-nib"></i> Start Writing</a>
-                <button class="btn btn-outline" id="signInTrigger">Sign In</button>
+                <div class="profile-menu-container" id="profileMenuContainer">
+                    <button class="profile-btn" id="profileBtn" title="Profile">
+                        <span id="profileAvatar" class="profile-avatar guest"><i class="fas fa-user"></i></span>
+                    </button>
+                    <div class="profile-dropdown" id="profileDropdown">
+                        <div class="profile-dropdown-header">
+                            <span id="profileDropdownName">Guest</span>
+                            <span id="profileDropdownEmail" class="profile-email"></span>
+                        </div>
+                        <ul class="profile-dropdown-list">
+                            <li id="profileDropdownProfile"><i class="fas fa-user-circle"></i> Profile</li>
+                            <li id="profileDropdownNotifications"><i class="fas fa-bell"></i> Notifications</li>
+                            <li id="profileDropdownSwitch"><i class="fas fa-exchange-alt"></i> Switch Account</li>
+                            <li id="profileDropdownLogout"><i class="fas fa-sign-out-alt"></i> Logout</li>
+                        </ul>
+                    </div>
+                </div>
             </div>
         </div>
     </nav>
