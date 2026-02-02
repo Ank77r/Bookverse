@@ -1,456 +1,512 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="scroll-smooth">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BOOKVERSE | Executive Dashboard</title>
+    <title>Elara | Bookverse OS</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,600;0,700;1,600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
-    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-    <script src="https://unpkg.com/lucide@latest"></script>
-
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    fontFamily: {
-                        sans: ['"Inter"', 'sans-serif'],
-                        serif: ['"Playfair Display"', 'serif'],
-                        mono: ['"JetBrains Mono"', 'monospace'],
-                    },
-                    colors: {
-                        bg: '#050505',
-                        surface: '#0F0F0F',
-                        glass: 'rgba(20, 20, 20, 0.7)',
-                        border: '#1F1F1F',
-                        gold: '#D4AF37',
-                        goldDim: '#8A7020',
-                    },
-                    animation: {
-                        'fade-in': 'fadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards',
-                        'slide-up': 'slideUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards',
-                        'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
-                    },
-                    keyframes: {
-                        fadeIn: { '0%': { opacity: 0 }, '100%': { opacity: 1 } },
-                        slideUp: { '0%': { transform: 'translateY(20px)', opacity: 0 }, '100%': { transform: 'translateY(0)', opacity: 1 } }
-                    }
-                }
-            }
-        }
-    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
 
     <style>
-        body { background-color: #050505; color: #e5e5e5; overflow: hidden; }
-        
-        /* Custom Scrollbar */
-        .scroller::-webkit-scrollbar { width: 5px; }
-        .scroller::-webkit-scrollbar-track { background: transparent; }
-        .scroller::-webkit-scrollbar-thumb { background: #333; border-radius: 10px; }
-        .scroller::-webkit-scrollbar-thumb:hover { background: #555; }
-
-        /* Glassmorphism Utilities */
-        .glass-panel {
-            background: rgba(18, 18, 18, 0.65);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+        /* --- THEME VARIABLES --- */
+        :root {
+            --bg-deep: #020617;
+            /* Smoked Glass: Visible but translucent */
+            --glass-bg: rgba(15, 23, 42, 0.85); 
+            --glass-border: rgba(255, 255, 255, 0.12);
+            --glass-highlight: rgba(255, 255, 255, 0.15);
         }
 
-        .glass-card {
-            background: linear-gradient(145deg, rgba(255,255,255,0.03) 0%, rgba(255,255,255,0.01) 100%);
-            border: 1px solid rgba(255, 255, 255, 0.05);
+        body {
+            font-family: 'Outfit', sans-serif;
+            background-color: var(--bg-deep);
+            color: #fff;
+            min-height: 100vh;
+            cursor: none;
+            overflow-x: hidden;
+        }
+
+        .font-serif { font-family: 'Instrument Serif', serif; }
+
+        /* --- VISUAL FX --- */
+        #starfield { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; }
+        .nebula { position: fixed; border-radius: 50%; filter: blur(120px); z-index: -1; opacity: 0.6; animation: nebulaPulse 20s infinite alternate cubic-bezier(0.4, 0, 0.2, 1); }
+        .nebula-1 { top: -10%; left: -10%; width: 700px; height: 700px; background: #4c1d95; }
+        .nebula-2 { bottom: -10%; right: -10%; width: 600px; height: 600px; background: #be185d; animation-delay: -5s; }
+        @keyframes nebulaPulse { 0% { opacity: 0.5; transform: scale(1); } 100% { opacity: 0.7; transform: scale(1.1); } }
+
+        /* --- BENTO CARDS --- */
+        .bento-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            position: relative;
+            overflow: hidden;
+            animation: gentleFloat 8s ease-in-out infinite;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            z-index: 10;
+        }
+        .bento-card:nth-child(odd) { animation-delay: 0.5s; }
+        .bento-card:nth-child(even) { animation-delay: -2s; }
+        @keyframes gentleFloat { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
+
+        .bento-card:hover {
+            animation-play-state: paused;
+            transform: translateY(-4px) scale(1.01);
+            background: rgba(30, 41, 59, 0.95);
+            border-color: var(--glass-highlight);
+            box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.6);
             transition: all 0.4s ease;
         }
-        .glass-card:hover {
-            border-color: rgba(212, 175, 55, 0.3); /* Gold border on hover */
-            transform: translateY(-4px);
-            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+
+        /* --- FORM INPUTS --- */
+        .glass-input {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: white;
+            padding: 12px 16px;
+            border-radius: 12px;
+            width: 100%;
+            outline: none;
+            transition: all 0.3s;
+        }
+        .glass-input:focus {
+            background: rgba(0, 0, 0, 0.5);
+            border-color: rgba(244, 114, 182, 0.5);
+            box-shadow: 0 0 15px rgba(244, 114, 182, 0.1);
         }
 
-        /* Ambient Noise Texture */
-        .noise-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.7' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.04'/%3E%3C/svg%3E");
-            pointer-events: none; z-index: 0;
+        /* --- CURSOR --- */
+        #cursor {
+            position: fixed; top: 0; left: 0; width: 12px; height: 12px;
+            background: #fff; border-radius: 50%; pointer-events: none; z-index: 9999;
+            box-shadow: 0 0 15px 2px rgba(255, 255, 255, 0.8), 0 0 30px 5px rgba(244, 114, 182, 0.4);
+            transform: translate3d(0,0,0); mix-blend-mode: overlay; transition: width 0.3s, height 0.3s;
         }
+        body.hovering #cursor { width: 40px; height: 40px; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255,255,255,0.6); margin-left: -14px; margin-top: -14px; }
 
-        /* Smooth text rendering */
-        * { -webkit-font-smoothing: antialiased; }
+        /* --- VIEW LOGIC --- */
+        .hidden-view { display: none !important; }
+        .animate-enter { animation: fadeInUp 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; }
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+        .taskbar-item.active { background: rgba(255, 255, 255, 0.15); box-shadow: 0 0 20px rgba(255, 255, 255, 0.1); color: #fff; }
+
+        /* --- MARQUEE --- */
+        .marquee-container { overflow: hidden; white-space: nowrap; mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent); }
+        .marquee-content { display: inline-block; animation: scroll 30s linear infinite; }
+        @keyframes scroll { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
     </style>
 </head>
-<body>
-    <div id="root"></div>
+<body class="p-4 md:p-8 pb-32">
 
-    <script type="text/babel">
-        // 4. PRE-FLIGHT CHECK
-        const { useState, useEffect, useMemo } = React;
+    <div id="cursor"></div>
+    <canvas id="starfield"></canvas>
+    <div class="nebula nebula-1"></div>
+    <div class="nebula nebula-2"></div>
+
+    <main id="view-dashboard" class="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-4 md:gap-6 relative z-10 animate-enter">
         
-        // Icon wrapper to ensure they render after React updates
-        const Icon = ({ name, size = 20, className = "" }) => {
-            useEffect(() => {
-                if (window.lucide) window.lucide.createIcons();
-            }, [name]);
-            return <i data-lucide={name} width={size} height={size} className={className}></i>;
-        };
-
-        // --- MOCK DATA ---
-        const USER_PROFILE = {
-            name: "Alex Sterling",
-            handle: "@alex_design",
-            role: "Product Architect",
-            bio: "Crafting digital experiences at the intersection of aesthetics and utility. Currently scaling BookVerse.",
-            location: "San Francisco, CA",
-            stats: { followers: 12400, following: 485, reads: 850200 }
-        };
-
-        const INITIAL_BOOKS = [
-            { id: 1, title: "The Quantum Thief", category: "Sci-Fi", reads: "450k", status: "Published", image: "https://images.unsplash.com/photo-1614728853913-1e1208922c2d?auto=format&fit=crop&q=80&w=400" },
-            { id: 2, title: "Grid Systems", category: "Design", reads: "1.2M", status: "Published", image: "https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&q=80&w=400" },
-            { id: 3, title: "Neon Nights", category: "Cyberpunk", reads: "12k", status: "Draft", image: "https://images.unsplash.com/photo-1555680202-c86f0e12f086?auto=format&fit=crop&q=80&w=400" },
-            { id: 4, title: "Silent Echoes", category: "Thriller", reads: "89k", status: "Reading", image: "https://images.unsplash.com/photo-1493246507139-91e8fad9978e?auto=format&fit=crop&q=80&w=400" },
-            { id: 5, title: "Abstract Mind", category: "Philosophy", reads: "340k", status: "Published", image: "https://images.unsplash.com/photo-1541963463532-d68292c34b19?auto=format&fit=crop&q=80&w=400" },
-            { id: 6, title: "Botanic Wars", category: "Fantasy", reads: "56k", status: "Published", image: "https://images.unsplash.com/photo-1518531933037-91b2f5f229cc?auto=format&fit=crop&q=80&w=400" }
-        ];
-
-        const NOTIFICATIONS = [
-            { id: 1, text: "Sarah liked your post 'Grid Systems'", time: "2m ago" },
-            { id: 2, text: "New milestone: 10k Followers!", time: "1h ago" },
-            { id: 3, text: "System Update: Dashboard v2.0 live", time: "1d ago" }
-        ];
-
-        // --- COMPONENTS ---
-
-        // A. The "Glass Dock" Sidebar (Unique Mechanism)
-        const GlassDock = ({ activeTab, setActiveTab }) => {
-            const menuItems = [
-                { id: 'overview', icon: 'layout-grid', label: 'Overview' },
-                { id: 'library', icon: 'library', label: 'Library' },
-                { id: 'drafts', icon: 'pen-tool', label: 'Studio' },
-                { id: 'analytics', icon: 'bar-chart-2', label: 'Analytics' },
-                { id: 'settings', icon: 'settings', label: 'Settings' },
-            ];
-
-            return (
-                <div className="fixed left-6 top-1/2 -translate-y-1/2 z-50 flex flex-col gap-6">
-                    {/* Brand Orb */}
-                    <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-gold to-yellow-600 flex items-center justify-center text-black font-serif font-bold text-xl shadow-[0_0_25px_rgba(212,175,55,0.4)]">
-                        B
-                    </div>
-
-                    {/* Navigation Pill */}
-                    <div className="glass-panel p-2 rounded-full flex flex-col gap-4 py-6">
-                        {menuItems.map((item) => {
-                            const isActive = activeTab === item.id;
-                            return (
-                                <div key={item.id} className="relative group px-1">
-                                    <button 
-                                        onClick={() => setActiveTab(item.id)}
-                                        className={`p-3 rounded-full transition-all duration-300 relative z-10 ${isActive ? 'bg-white text-black shadow-lg' : 'text-gray-500 hover:text-white hover:bg-white/10'}`}
-                                    >
-                                        <Icon name={item.icon} size={20} />
-                                    </button>
-                                    
-                                    {/* Tooltip popping out from right */}
-                                    <span className="absolute left-16 top-1/2 -translate-y-1/2 px-3 py-1 bg-surface border border-border text-xs text-white rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none tracking-widest uppercase font-semibold">
-                                        {item.label}
-                                    </span>
-                                </div>
-                            )
-                        })}
-                    </div>
+        <div class="bento-card md:col-span-2 md:row-span-2 flex flex-col group p-0">
+            <div class="h-32 w-full bg-cover bg-center relative" style="background-image: url('https://images.unsplash.com/photo-1519681393784-d120267933ba?w=800&fit=crop'); mask-image: linear-gradient(to bottom, black 50%, transparent 100%);">
+                <div class="absolute top-4 right-4 bg-black/60 backdrop-blur-md px-3 py-1 rounded-full text-xs font-medium border border-white/10 flex items-center gap-2 shadow-[0_0_15px_rgba(74,222,128,0.2)]">
+                    <span class="w-2 h-2 rounded-full bg-green-400 shadow-[0_0_10px_#4ade80] animate-pulse"></span> Online
                 </div>
-            );
-        };
-
-        // B. Animated Stat Card
-        const StatBadge = ({ value, label }) => (
-            <div className="flex flex-col items-center justify-center p-4 min-w-[100px] border-r border-white/5 last:border-0">
-                <span className="font-serif text-2xl text-white italic">{value}</span>
-                <span className="text-[10px] text-gray-500 uppercase tracking-widest mt-1">{label}</span>
             </div>
-        );
-
-        // C. Book Card 
-        const BookCard = ({ book }) => (
-            <div className="glass-card rounded-xl overflow-hidden group cursor-pointer animate-slide-up relative">
-                {/* Image Area */}
-                <div className="relative aspect-[3/4] overflow-hidden">
-                    <img src={book.image} className="w-full h-full object-cover opacity-80 group-hover:opacity-100 group-hover:scale-110 transition-all duration-700" />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-transparent to-transparent opacity-60 group-hover:opacity-40 transition-opacity"></div>
-                    
-                    {/* Floating Badge */}
-                    <div className="absolute top-3 left-3 px-2 py-1 bg-black/50 backdrop-blur border border-white/10 rounded text-[9px] uppercase tracking-wide text-white">
-                        {book.category}
+            <div class="px-8 pb-8 -mt-12 flex flex-col h-full justify-between">
+                <div class="flex justify-between items-end">
+                    <div class="relative">
+                        <div class="w-24 h-24 rounded-full border-4 border-[#020617] bg-zinc-800 overflow-hidden shadow-2xl group-hover:scale-105 transition-transform duration-500">
+                            <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&h=200&fit=crop" class="w-full h-full object-cover">
+                        </div>
+                        <div class="absolute bottom-1 right-1 bg-gradient-to-r from-amber-300 to-orange-500 text-black text-[10px] font-bold px-2 py-0.5 rounded-full border border-white shadow-lg">LVL 42</div>
                     </div>
-
-                    {/* Hover Actions */}
-                    <div className="absolute inset-0 flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-black/40 backdrop-blur-sm">
-                        <button className="px-4 py-2 bg-white text-black text-xs font-bold uppercase rounded-full hover:scale-105 transition-transform">Read</button>
-                        <button className="p-2 bg-black/50 text-white rounded-full border border-white/20 hover:bg-white hover:text-black transition-colors"><Icon name="edit-2" size={14}/></button>
-                    </div>
+                    <button onclick="editProfile()" class="mb-2 px-4 py-2 rounded-xl bg-white/5 hover:bg-white/20 border border-white/10 transition-colors text-sm font-medium flex gap-2 items-center group/btn">
+                        <i data-lucide="settings" class="w-4 h-4 group-hover/btn:rotate-90 transition-transform"></i> Edit Profile
+                    </button>
                 </div>
-
-                {/* Meta Area */}
-                <div className="p-4 bg-surface border-t border-white/5">
-                    <div className="flex justify-between items-start mb-2">
-                        <h3 className="font-serif text-lg text-white group-hover:text-gold transition-colors leading-tight">{book.title}</h3>
+                <div class="mt-4">
+                    <h1 class="text-4xl font-serif italic text-white tracking-wide drop-shadow-lg">Elara Vance</h1>
+                    <p class="text-indigo-200 mt-1 font-light opacity-90">Fantasy Author & avid reader. <br> Lost in the Cosmere.</p>
+                </div>
+                <div class="mt-6 flex items-center gap-6 p-4 bg-white/5 rounded-2xl border border-white/5 backdrop-blur-sm shadow-inner">
+                    <div class="text-center hover:scale-110 transition-transform duration-300">
+                        <span class="block text-xl font-bold text-white">142</span>
+                        <span class="text-xs text-indigo-300 uppercase tracking-wider">Books</span>
                     </div>
-                    <div className="flex justify-between items-center text-xs text-gray-500 font-mono">
-                        <span>{book.status}</span>
-                        <span className="flex items-center gap-1"><Icon name="eye" size={12}/> {book.reads}</span>
+                    <div class="w-[1px] h-8 bg-white/10"></div>
+                    <div class="text-center hover:scale-110 transition-transform duration-300">
+                        <span class="block text-xl font-bold text-white">1.2k</span>
+                        <span class="text-xs text-indigo-300 uppercase tracking-wider">Followers</span>
                     </div>
                 </div>
             </div>
-        );
+        </div>
 
-        // --- MAIN APPLICATION ---
-        const App = () => {
-            const [activeTab, setActiveTab] = useState('overview');
-            const [searchQuery, setSearchQuery] = useState('');
-            const [isFollowing, setIsFollowing] = useState(false);
-            const [followerCount, setFollowerCount] = useState(USER_PROFILE.stats.followers);
-            const [notificationsOpen, setNotificationsOpen] = useState(false);
-            const [sortBy, setSortBy] = useState('Newest');
+        <div class="bento-card p-6 flex flex-col justify-between h-48 md:h-auto overflow-hidden relative group">
+            <div class="absolute inset-0 bg-gradient-to-br from-indigo-500/10 to-purple-500/10 opacity-60 group-hover:opacity-100 transition-opacity duration-700"></div>
+            <div class="flex justify-between items-start z-10">
+                <div class="p-2 bg-white/10 rounded-lg text-indigo-200"><i data-lucide="hourglass" class="w-5 h-5"></i></div>
+                <div class="text-right"><p class="text-3xl font-bold text-white tracking-tight">128h</p><p class="text-xs text-indigo-200">Total Read Time</p></div>
+            </div>
+            <div class="mt-auto z-10">
+                <div class="flex justify-between text-xs mb-1"><span class="text-indigo-200">Daily Goal</span><span class="text-white font-bold">45m / 60m</span></div>
+                <div class="w-full h-1.5 bg-black/30 rounded-full overflow-hidden"><div class="h-full bg-gradient-to-r from-cyan-400 to-blue-500 w-[75%] shadow-[0_0_15px_rgba(34,211,238,0.4)]"></div></div>
+            </div>
+        </div>
 
-            // Toggle Follow Logic
-            const toggleFollow = () => {
-                setIsFollowing(!isFollowing);
-                setFollowerCount(prev => isFollowing ? prev - 1 : prev + 1);
-            };
-
-            // Formatting numbers (e.g. 12400 -> 12.4k)
-            const formatNum = (num) => {
-                return num >= 1000 ? (num / 1000).toFixed(1) + 'k' : num;
-            };
-
-            // Filtering Data
-            const filteredBooks = useMemo(() => {
-                let data = INITIAL_BOOKS;
-                
-                // Tab Filter
-                if (activeTab === 'library') data = data.filter(b => b.status === 'Published' || b.status === 'Reading');
-                if (activeTab === 'drafts') data = data.filter(b => b.status === 'Draft');
-
-                // Search Filter
-                if (searchQuery) {
-                    data = data.filter(b => b.title.toLowerCase().includes(searchQuery.toLowerCase()) || b.category.toLowerCase().includes(searchQuery.toLowerCase()));
-                }
-
-                // Sort Filter
-                if (sortBy === 'Popular') {
-                    // Quick hack to sort by string "450k"
-                    data = [...data].sort((a,b) => parseInt(b.reads) - parseInt(a.reads));
-                } else {
-                    data = [...data].sort((a,b) => b.id - a.id);
-                }
-
-                return data;
-            }, [activeTab, searchQuery, sortBy]);
-
-            // Render Content based on Tab
-            const renderContent = () => {
-                if (activeTab === 'analytics') {
-                    return (
-                        <div className="w-full h-96 glass-panel rounded-2xl flex flex-col items-center justify-center text-gray-500 animate-fade-in border border-dashed border-white/20">
-                            <Icon name="bar-chart-2" size={48} className="mb-4 text-gold opacity-50" />
-                            <h2 className="text-xl text-white font-serif mb-2">Analytics Engine</h2>
-                            <p>Data visualization modules are initializing...</p>
-                        </div>
-                    );
-                }
-                
-                if (activeTab === 'settings') {
-                    return (
-                        <div className="glass-panel rounded-2xl p-8 animate-fade-in max-w-2xl">
-                            <h2 className="text-2xl font-serif text-white mb-6">System Settings</h2>
-                            <div className="space-y-4">
-                                <div className="flex justify-between items-center py-4 border-b border-white/10">
-                                    <span>Profile Visibility</span>
-                                    <div className="w-10 h-5 bg-green-500 rounded-full relative"><div className="absolute right-1 top-1 w-3 h-3 bg-white rounded-full"></div></div>
-                                </div>
-                                <div className="flex justify-between items-center py-4 border-b border-white/10">
-                                    <span>Email Notifications</span>
-                                    <div className="w-10 h-5 bg-gray-700 rounded-full relative"><div className="absolute left-1 top-1 w-3 h-3 bg-white rounded-full"></div></div>
-                                </div>
-                            </div>
-                        </div>
-                    );
-                }
-
-                return (
-                    <div className="animate-fade-in">
-                        {/* Filters Bar */}
-                        <div className="flex flex-wrap items-center justify-between mb-8 gap-4">
-                            <h2 className="text-3xl font-serif text-white capitalize">{activeTab} <span className="text-gold">.</span></h2>
-                            
-                            <div className="flex items-center gap-3">
-                                <span className="text-xs text-gray-500 uppercase tracking-widest mr-2">Sort By:</span>
-                                {['Newest', 'Popular'].map(sort => (
-                                    <button 
-                                        key={sort}
-                                        onClick={() => setSortBy(sort)}
-                                        className={`px-3 py-1 rounded text-xs border transition-colors ${sortBy === sort ? 'bg-white text-black border-white' : 'text-gray-400 border-white/10 hover:border-white'}`}
-                                    >
-                                        {sort}
-                                    </button>
-                                ))}
-                            </div>
-                        </div>
-
-                        {/* Grid */}
-                        {filteredBooks.length > 0 ? (
-                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                                {filteredBooks.map(book => <BookCard key={book.id} book={book} />)}
-                            </div>
-                        ) : (
-                            <div className="w-full py-20 flex flex-col items-center justify-center text-gray-600 border border-white/5 rounded-2xl bg-white/[0.02]">
-                                <Icon name="search-x" size={32} className="mb-3"/>
-                                <p>No results found for "{searchQuery}"</p>
-                            </div>
-                        )}
-                    </div>
-                );
-            };
-
-            return (
-                <div className="relative min-h-screen w-full pl-0 md:pl-28 bg-bg">
-                    <div className="noise-overlay"></div>
-                    
-                    {/* Navigation */}
-                    <div className="hidden md:block">
-                        <GlassDock activeTab={activeTab} setActiveTab={setActiveTab} />
-                    </div>
-
-                    {/* Mobile Nav (Fallback) */}
-                    <div className="md:hidden fixed bottom-0 left-0 w-full glass-panel z-50 flex justify-around p-4 border-t border-white/10">
-                        {['overview', 'library', 'drafts', 'settings'].map(id => (
-                            <button key={id} onClick={() => setActiveTab(id)} className={activeTab === id ? 'text-gold' : 'text-gray-500'}>
-                                <Icon name={id === 'overview' ? 'layout-grid' : id === 'library' ? 'library' : id === 'drafts' ? 'pen-tool' : 'settings'} />
-                            </button>
-                        ))}
-                    </div>
-
-                    {/* Main Content Area */}
-                    <main className="relative z-10 flex flex-col h-screen overflow-y-auto scroller">
-                        
-                        {/* Top Header */}
-                        <header className="sticky top-0 z-40 px-6 py-4 glass-panel border-b border-white/5 flex items-center justify-between">
-                            {/* Search */}
-                            <div className="relative group w-full max-w-md">
-                                <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none">
-                                    <Icon name="search" size={16} className="text-gray-500 group-focus-within:text-gold transition-colors" />
-                                </div>
-                                <input 
-                                    type="text" 
-                                    placeholder="Search your universe..." 
-                                    value={searchQuery}
-                                    onChange={(e) => setSearchQuery(e.target.value)}
-                                    className="w-full bg-black/20 border border-white/10 rounded-lg py-2 pl-10 pr-4 text-sm text-white focus:outline-none focus:border-gold/50 transition-colors placeholder-gray-600"
-                                />
-                            </div>
-
-                            {/* Actions */}
-                            <div className="flex items-center gap-4 ml-4">
-                                <button 
-                                    className="relative p-2 text-gray-400 hover:text-white transition-colors"
-                                    onClick={() => setNotificationsOpen(!notificationsOpen)}
-                                >
-                                    <Icon name="bell" size={20} />
-                                    <span className="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full animate-pulse"></span>
-                                </button>
-                                <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-gray-700 to-gray-600 border border-white/20">
-                                    <img src="https://i.pravatar.cc/150?u=alex" alt="Profile" className="w-full h-full rounded-full opacity-80" />
-                                </div>
-                            </div>
-                        </header>
-
-                        {/* Notification Drawer (Conditional) */}
-                        {notificationsOpen && (
-                            <div className="absolute top-16 right-6 w-80 glass-panel rounded-xl z-50 animate-fade-in overflow-hidden">
-                                <div className="p-4 border-b border-white/10 flex justify-between items-center">
-                                    <h4 className="font-bold text-sm text-white">Notifications</h4>
-                                    <button onClick={() => setNotificationsOpen(false)}><Icon name="x" size={14}/></button>
-                                </div>
-                                <ul>
-                                    {NOTIFICATIONS.map(n => (
-                                        <li key={n.id} className="p-4 hover:bg-white/5 border-b border-white/5 last:border-0 text-xs text-gray-300">
-                                            <p className="mb-1 text-white">{n.text}</p>
-                                            <span className="text-gray-500">{n.time}</span>
-                                        </li>
-                                    ))}
-                                </ul>
-                            </div>
-                        )}
-
-                        {/* Scrollable Content */}
-                        <div className="p-6 md:p-12 max-w-7xl mx-auto w-full pb-24">
-                            
-                            {/* Hero Section (Always Visible on Overview) */}
-                            {activeTab === 'overview' && (
-                                <section className="relative mb-16 animate-fade-in">
-                                    <div className="absolute top-0 right-0 p-32 bg-gold/10 blur-[100px] rounded-full pointer-events-none"></div>
-                                    
-                                    <div className="flex flex-col md:flex-row items-end gap-8 relative z-10">
-                                        {/* Avatar */}
-                                        <div className="relative group">
-                                            <div className="w-32 h-32 md:w-40 md:h-40 rounded-full border-2 border-white/10 p-1">
-                                                <img src="https://i.pravatar.cc/300?u=alex" className="w-full h-full rounded-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500" />
-                                            </div>
-                                            <div className="absolute bottom-2 right-2 bg-blue-500 text-white p-1 rounded-full border-4 border-bg">
-                                                <Icon name="check" size={12} strokeWidth={4} />
-                                            </div>
-                                        </div>
-
-                                        {/* Info */}
-                                        <div className="flex-1 space-y-4">
-                                            <div>
-                                                <h1 className="text-5xl md:text-6xl font-serif text-white italic tracking-tight mb-2">{USER_PROFILE.name}</h1>
-                                                <div className="flex items-center gap-2 text-gold text-sm font-mono uppercase tracking-widest">
-                                                    <Icon name="terminal" size={14} />
-                                                    {USER_PROFILE.role}
-                                                </div>
-                                            </div>
-                                            <p className="text-gray-400 max-w-xl leading-relaxed">{USER_PROFILE.bio}</p>
-                                        </div>
-
-                                        {/* Action Buttons */}
-                                        <div className="flex flex-col items-end gap-4">
-                                            <div className="flex gap-4 glass-panel rounded-xl pr-4">
-                                                <StatBadge value={formatNum(followerCount)} label="Followers" />
-                                                <StatBadge value={formatNum(USER_PROFILE.stats.following)} label="Following" />
-                                                <StatBadge value={formatNum(USER_PROFILE.stats.reads)} label="Reads" />
-                                            </div>
-                                            <button 
-                                                onClick={toggleFollow}
-                                                className={`px-8 py-3 rounded-full text-xs font-bold uppercase tracking-widest transition-all ${isFollowing ? 'bg-transparent border border-white/20 text-white' : 'bg-white text-black hover:bg-gold hover:text-black'}`}
-                                            >
-                                                {isFollowing ? 'Following' : 'Follow Author'}
-                                            </button>
-                                        </div>
-                                    </div>
-                                </section>
-                            )}
-
-                            {/* Dynamic Content */}
-                            {renderContent()}
-
-                        </div>
-                    </main>
+        <div class="bento-card p-6 flex flex-col justify-between group h-48 md:h-auto relative overflow-hidden">
+            <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-full group-hover:animate-[shimmer_1.5s_infinite] pointer-events-none"></div>
+            <div class="flex justify-between items-center mb-2 z-10">
+                <span class="text-xs font-bold text-pink-300 uppercase tracking-wider">Reading Now</span>
+                <div class="w-2 h-2 rounded-full bg-pink-500 animate-[ping_2s_cubic-bezier(0,0,0.2,1)_infinite]"></div>
+            </div>
+            <div class="flex gap-4 z-10">
+                <img src="https://images.unsplash.com/photo-1629198688000-71f23e745b6e?w=150&h=220&fit=crop" class="w-16 h-24 rounded-lg object-cover shadow-2xl rotate-[-3deg] group-hover:rotate-0 transition-all duration-500 border border-white/10">
+                <div class="flex flex-col justify-center">
+                    <h3 class="font-bold text-white text-sm leading-tight line-clamp-2">The Midnight Library</h3>
+                    <p class="text-xs text-zinc-400 mt-1">Matt Haig</p>
+                    <p class="text-xs text-zinc-500 mt-2">Page 42 <span class="text-white/20">/</span> 300</p>
                 </div>
-            );
-        };
+            </div>
+        </div>
 
-        const root = ReactDOM.createRoot(document.getElementById('root'));
-        root.render(<App />);
+        <div class="bento-card md:col-span-4 p-5 flex items-center bg-black/20 border-white/5">
+            <div class="flex-shrink-0 mr-6 flex items-center gap-2 px-3 py-1.5 bg-white/5 rounded-lg border border-white/10">
+                <div class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
+                <span class="text-xs font-bold text-white tracking-widest uppercase">Live Activity</span>
+            </div>
+            <div class="marquee-container w-full mask-image-linear">
+                <div class="marquee-content flex gap-12 items-center text-sm font-medium text-zinc-300">
+                    <span class="flex items-center gap-2 hover:text-white transition-colors"><i data-lucide="check-circle-2" class="w-4 h-4 text-green-400"></i> Finished 'Dune' <span class="text-zinc-600 text-xs ml-1">2h ago</span></span>
+                    <span class="flex items-center gap-2 hover:text-white transition-colors"><i data-lucide="message-square" class="w-4 h-4 text-blue-400"></i> Commented on Ch. 3 <span class="text-zinc-600 text-xs ml-1">5h ago</span></span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="bento-card md:col-span-4 p-6 md:p-8 min-h-[400px]">
+            <div class="flex flex-col md:flex-row md:justify-between md:items-center gap-4 mb-8">
+                <h3 class="text-2xl font-serif italic text-white flex items-center gap-2">
+                    My Library <span class="text-xs font-sans not-italic text-zinc-400 font-bold bg-white/5 px-2 py-1 rounded-md border border-white/5">142</span>
+                </h3>
+                
+                <div class="flex p-1 bg-black/40 rounded-xl border border-white/10 backdrop-blur-sm overflow-x-auto">
+                    <button onclick="switchTab('reading', this)" class="tab-btn active px-4 py-2 rounded-lg text-sm font-medium text-zinc-400 hover:text-white transition-all bg-white/10 shadow-[0_0_10px_rgba(255,255,255,0.1)]">Reading</button>
+                    <button onclick="switchTab('tbr', this)" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium text-zinc-400 hover:text-white transition-all">TBR</button>
+                    <button onclick="switchTab('completed', this)" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium text-zinc-400 hover:text-white transition-all">Completed</button>
+                </div>
+            </div>
+            
+            <div id="tab-reading" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4 animate-enter">
+                <div class="group relative cursor-pointer">
+                    <div class="aspect-[2/3] rounded-xl overflow-hidden mb-2 shadow-lg border border-white/10 relative">
+                        <div class="absolute inset-0 bg-gradient-to-tr from-transparent via-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 z-20 pointer-events-none"></div>
+                        <img src="https://images.unsplash.com/photo-1629198688000-71f23e745b6e?w=300&fit=crop" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700">
+                        <div class="absolute bottom-0 left-0 w-full h-1 bg-zinc-700"><div class="h-full bg-pink-500 w-[40%] shadow-[0_0_10px_#ec4899]"></div></div>
+                        <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity z-10 bg-black/40 backdrop-blur-[1px]">
+                            <i data-lucide="book-open" class="w-8 h-8 text-white drop-shadow-lg"></i>
+                        </div>
+                    </div>
+                    <h4 class="font-bold text-sm text-white line-clamp-1 mt-2 group-hover:text-pink-400 transition-colors">The Midnight Library</h4>
+                    <p class="text-xs text-zinc-500">Matt Haig</p>
+                </div>
+                 <div class="group relative border border-dashed border-white/20 rounded-xl aspect-[2/3] flex flex-col items-center justify-center hover:bg-white/5 transition-colors cursor-pointer hover:border-pink-500/50">
+                    <div class="w-12 h-12 rounded-full bg-white/5 flex items-center justify-center mb-2 group-hover:scale-110 group-hover:bg-pink-500/20 transition-all">
+                        <i data-lucide="plus" class="w-6 h-6 text-zinc-400 group-hover:text-pink-400"></i>
+                    </div>
+                    <span class="text-xs text-zinc-500 font-medium group-hover:text-pink-300">Add Book</span>
+                 </div>
+            </div>
+
+            <div id="tab-tbr" class="hidden grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4 animate-enter">
+                <div class="group relative cursor-pointer">
+                     <div class="aspect-[2/3] rounded-xl overflow-hidden mb-2 shadow-lg border border-white/10">
+                        <img src="https://images.unsplash.com/photo-1543002588-bfa74002ed7e?w=300&fit=crop" class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500">
+                    </div>
+                    <h4 class="font-bold text-sm text-white line-clamp-1 mt-2">Project Hail Mary</h4>
+                    <span class="text-[10px] border border-white/20 px-1.5 py-0.5 rounded text-zinc-400 mt-1 inline-block">Sci-Fi</span>
+                </div>
+            </div>
+
+            <div id="tab-completed" class="hidden grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4 animate-enter">
+                 <div class="group relative cursor-pointer">
+                     <div class="aspect-[2/3] rounded-xl overflow-hidden mb-2 shadow-lg border border-white/10">
+                        <img src="https://images.unsplash.com/photo-1544947950-fa07a98d237f?w=300&fit=crop" class="w-full h-full object-cover">
+                         <div class="absolute top-2 right-2 bg-green-500 text-black text-[10px] font-bold px-2 py-0.5 rounded shadow-lg">5.0</div>
+                    </div>
+                    <h4 class="font-bold text-sm text-white line-clamp-1 mt-2">Atomic Habits</h4>
+                    <div class="flex text-yellow-500 mt-1 gap-0.5">
+                        <i data-lucide="star" class="w-3 h-3 fill-current"></i>
+                        <i data-lucide="star" class="w-3 h-3 fill-current"></i>
+                        <i data-lucide="star" class="w-3 h-3 fill-current"></i>
+                        <i data-lucide="star" class="w-3 h-3 fill-current"></i>
+                        <i data-lucide="star" class="w-3 h-3 fill-current"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <section id="view-profile" class="hidden-view max-w-4xl mx-auto py-8 animate-enter relative">
+        <div class="mb-8 flex justify-between items-center">
+            <div>
+                <h2 class="text-4xl font-serif italic text-white">Profile Settings</h2>
+                <p class="text-indigo-200">Manage your identity and visibility across Bookverse.</p>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="md:col-span-1 space-y-6">
+                <div class="bento-card p-6 flex flex-col items-center justify-center text-center">
+                    <div class="relative group cursor-pointer mb-4">
+                         <div class="w-32 h-32 rounded-full border-4 border-[#020617] overflow-hidden shadow-2xl">
+                            <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=300&h=300&fit=crop" class="w-full h-full object-cover group-hover:opacity-50 transition-opacity">
+                        </div>
+                        <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                            <i data-lucide="camera" class="w-8 h-8 text-white"></i>
+                        </div>
+                    </div>
+                    <button class="text-xs font-bold text-indigo-300 hover:text-white uppercase tracking-wider">Change Avatar</button>
+                </div>
+                <div class="bento-card p-6 h-32 bg-cover bg-center relative group cursor-pointer" style="background-image: url('https://images.unsplash.com/photo-1519681393784-d120267933ba?w=400&fit=crop');">
+                    <div class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center rounded-2xl">
+                        <span class="text-xs font-bold text-white border border-white/50 px-2 py-1 rounded">Edit Banner</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="md:col-span-2 bento-card p-8">
+                <form class="space-y-6" onsubmit="event.preventDefault();">
+                    <div class="grid grid-cols-2 gap-4">
+                        <div><label class="block text-xs font-bold text-zinc-400 uppercase mb-2">Display Name</label><input type="text" value="Elara Vance" class="glass-input"></div>
+                        <div><label class="block text-xs font-bold text-zinc-400 uppercase mb-2">Username</label><input type="text" value="@elara_reads" class="glass-input"></div>
+                    </div>
+                    <div><label class="block text-xs font-bold text-zinc-400 uppercase mb-2">Bio</label><textarea rows="4" class="glass-input">Fantasy Author & avid reader. 
+Lost in the Cosmere.</textarea></div>
+                    <div class="pt-4 border-t border-white/10">
+                        <label class="block text-xs font-bold text-zinc-400 uppercase mb-4">Preferences</label>
+                        <div class="flex items-center justify-between mb-4"><span class="text-sm text-zinc-300">Show Reading Activity</span><div class="w-10 h-5 bg-green-500/20 rounded-full relative cursor-pointer border border-green-500/50"><div class="absolute right-0.5 top-0.5 w-4 h-4 bg-green-400 rounded-full shadow-[0_0_10px_#4ade80]"></div></div></div>
+                        <div class="flex items-center justify-between"><span class="text-sm text-zinc-300">Allow Friend Requests</span><div class="w-10 h-5 bg-green-500/20 rounded-full relative cursor-pointer border border-green-500/50"><div class="absolute right-0.5 top-0.5 w-4 h-4 bg-green-400 rounded-full shadow-[0_0_10px_#4ade80]"></div></div></div>
+                    </div>
+                    <div class="flex justify-end gap-3 pt-4">
+                        <button onclick="setView('dashboard')" class="px-6 py-2.5 rounded-xl border border-white/10 hover:bg-white/5 text-zinc-400 hover:text-white transition-colors">Cancel</button>
+                        <button class="px-6 py-2.5 rounded-xl bg-indigo-500 hover:bg-indigo-400 text-white font-bold shadow-[0_0_20px_rgba(99,102,241,0.4)] transition-all transform hover:scale-105">Save Changes</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <section id="view-achievements" class="hidden-view max-w-4xl mx-auto py-8 animate-enter relative min-h-[80vh]">
+        <div class="text-center mb-12">
+            <h2 class="text-5xl font-serif italic text-white mb-2">Constellation Path</h2>
+            <p class="text-indigo-200">Track your journey through the Bookverse.</p>
+        </div>
+        <div class="relative pl-8 md:pl-0">
+            <div class="absolute left-8 md:left-1/2 top-0 bottom-0 w-1 bg-gradient-to-b from-pink-500 via-indigo-500 to-transparent opacity-30 transform md:-translate-x-1/2"></div>
+
+            <div class="flex flex-col md:flex-row items-center w-full mb-12 group">
+                <div class="hidden md:block w-1/2 pr-8 text-right order-1">
+                    <div class="bento-card p-6 rounded-2xl inline-block w-full max-w-sm border-pink-500/30">
+                        <div class="flex justify-end items-center gap-2 mb-2 text-pink-400"><span class="text-xs font-bold uppercase tracking-widest">Unlocked</span><i data-lucide="check-circle" class="w-4 h-4"></i></div>
+                        <h3 class="text-xl font-bold text-white">The First Chapter</h3>
+                        <p class="text-sm text-zinc-400 mt-1">Completed your first book.</p>
+                        <p class="text-[10px] text-zinc-500 mt-3 font-mono">Jan 12, 2024</p>
+                    </div>
+                </div>
+                <div class="w-16 h-16 rounded-full bg-[#020617] border-4 border-pink-500 flex items-center justify-center shadow-[0_0_20px_rgba(236,72,153,0.5)] z-10 md:order-2 absolute left-0 md:static group-hover:scale-125 transition-transform duration-300">
+                    <i data-lucide="book-open" class="w-6 h-6 text-pink-500"></i>
+                </div>
+                <div class="w-1/2 pl-8 hidden md:block md:order-3"></div> 
+            </div>
+
+            <div class="flex flex-col md:flex-row items-center w-full mb-12 group">
+                <div class="w-1/2 pr-8 hidden md:block order-1"></div>
+                <div class="w-16 h-16 rounded-full bg-[#020617] border-4 border-indigo-500 flex items-center justify-center shadow-[0_0_20px_rgba(99,102,241,0.5)] z-10 md:order-2 absolute left-0 md:static group-hover:scale-125 transition-transform duration-300">
+                    <i data-lucide="zap" class="w-6 h-6 text-indigo-500"></i>
+                </div>
+                <div class="hidden md:block w-1/2 pl-8 text-left order-3">
+                    <div class="bento-card p-6 rounded-2xl inline-block w-full max-w-sm border-indigo-500/30">
+                        <div class="flex justify-start items-center gap-2 mb-2 text-indigo-400"><i data-lucide="zap" class="w-4 h-4"></i><span class="text-xs font-bold uppercase tracking-widest">Unlocked</span></div>
+                        <h3 class="text-xl font-bold text-white">Wordsmith</h3>
+                        <p class="text-sm text-zinc-400 mt-1">Wrote 5 reviews with >10 likes.</p>
+                    </div>
+                </div>
+            </div>
+
+             <div class="flex flex-col md:flex-row items-center w-full mb-12 opacity-50">
+                 <div class="hidden md:block w-1/2 pr-8 text-right order-1">
+                    <div class="bento-card p-6 rounded-2xl inline-block w-full max-w-sm border-zinc-700 bg-transparent">
+                        <div class="flex justify-end items-center gap-2 mb-2 text-zinc-500"><span class="text-xs font-bold uppercase tracking-widest">Locked</span><i data-lucide="lock" class="w-4 h-4"></i></div>
+                        <h3 class="text-xl font-bold text-zinc-300">Cosmere Sage</h3>
+                        <p class="text-sm text-zinc-500 mt-1">Read 10 books in Fantasy genre.</p>
+                        <div class="w-full bg-zinc-800 h-1 mt-3 rounded-full"><div class="bg-zinc-500 h-1 w-[60%] rounded-full"></div></div>
+                    </div>
+                </div>
+                <div class="w-12 h-12 rounded-full bg-[#020617] border-2 border-zinc-600 flex items-center justify-center z-10 md:order-2 absolute left-2 md:static">
+                    <i data-lucide="lock" class="w-4 h-4 text-zinc-600"></i>
+                </div>
+                 <div class="w-1/2 pl-8 hidden md:block md:order-3"></div>
+            </div>
+        </div>
+    </section>
+
+    <section id="view-author" class="hidden-view max-w-5xl mx-auto py-8 animate-enter">
+        <div class="flex justify-between items-end mb-8">
+            <div>
+                <span class="text-xs font-bold text-yellow-500 uppercase tracking-widest border border-yellow-500/20 bg-yellow-500/10 px-2 py-1 rounded">Creator Access</span>
+                <h2 class="text-4xl font-serif italic text-white mt-2">Author Studio</h2>
+            </div>
+            <button class="px-5 py-2 rounded-xl bg-yellow-500 text-black font-bold hover:scale-105 transition-transform shadow-[0_0_20px_rgba(234,179,8,0.4)] flex items-center gap-2">
+                <i data-lucide="plus-circle" class="w-4 h-4"></i> Create New Book
+            </button>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="bento-card p-6 border-yellow-500/20">
+                <p class="text-zinc-400 text-sm">Total Reads</p>
+                <h3 class="text-3xl font-bold text-white mt-1">842.3k</h3>
+                <div class="w-full bg-zinc-800 h-1 mt-4 rounded-full"><div class="bg-yellow-500 h-full w-[80%] rounded-full shadow-[0_0_10px_orange]"></div></div>
+            </div>
+            <div class="bento-card p-6 border-yellow-500/20">
+                <p class="text-zinc-400 text-sm">Est. Royalties</p>
+                <h3 class="text-3xl font-bold text-white mt-1">$4,290.50</h3>
+                 <span class="text-xs text-green-400 mt-1 block">+12% from last month</span>
+            </div>
+            <div class="bento-card p-6 border-yellow-500/20">
+                <p class="text-zinc-400 text-sm">Subscribers</p>
+                <h3 class="text-3xl font-bold text-white mt-1">12.5k</h3>
+                <div class="flex -space-x-2 mt-2">
+                    <div class="w-6 h-6 rounded-full bg-zinc-700 border border-black"></div>
+                    <div class="w-6 h-6 rounded-full bg-zinc-600 border border-black"></div>
+                    <div class="w-6 h-6 rounded-full bg-zinc-500 border border-black text-[8px] flex items-center justify-center">+</div>
+                </div>
+            </div>
+
+            <div class="bento-card md:col-span-3 p-6">
+                <h3 class="text-xl font-bold text-white mb-4">Your Drafts</h3>
+                <div class="space-y-2">
+                    <div class="flex items-center justify-between p-3 rounded-xl bg-white/5 hover:bg-white/10 transition-colors border border-white/5">
+                        <div class="flex items-center gap-4">
+                            <div class="w-10 h-12 bg-zinc-800 rounded flex items-center justify-center text-zinc-500"><i data-lucide="file-text" class="w-5 h-5"></i></div>
+                            <div>
+                                <h4 class="font-bold text-white text-sm">The Lost Kingdom - Ch. 12</h4>
+                                <p class="text-xs text-zinc-500">Last edited 2h ago</p>
+                            </div>
+                        </div>
+                        <div class="flex gap-2">
+                            <button class="p-2 hover:bg-white/10 rounded-lg text-zinc-400 hover:text-white"><i data-lucide="edit-2" class="w-4 h-4"></i></button>
+                            <button class="p-2 hover:bg-red-500/20 rounded-lg text-zinc-400 hover:text-red-400"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                        </div>
+                    </div>
+                    <div class="flex items-center justify-between p-3 rounded-xl bg-white/5 hover:bg-white/10 transition-colors border border-white/5">
+                        <div class="flex items-center gap-4">
+                            <div class="w-10 h-12 bg-zinc-800 rounded flex items-center justify-center text-zinc-500"><i data-lucide="file-text" class="w-5 h-5"></i></div>
+                            <div>
+                                <h4 class="font-bold text-white text-sm">Character Notes: Aeliana</h4>
+                                <p class="text-xs text-zinc-500">Last edited yesterday</p>
+                            </div>
+                        </div>
+                        <div class="flex gap-2">
+                            <button class="p-2 hover:bg-white/10 rounded-lg text-zinc-400 hover:text-white"><i data-lucide="edit-2" class="w-4 h-4"></i></button>
+                            <button class="p-2 hover:bg-red-500/20 rounded-lg text-zinc-400 hover:text-red-400"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div class="fixed bottom-6 left-1/2 transform -translate-x-1/2 z-50 w-auto">
+        <div class="flex items-center gap-3 p-3 rounded-2xl bg-[#020617]/90 backdrop-blur-xl border border-white/10 shadow-[0_10px_40px_rgba(0,0,0,0.8)] ring-1 ring-white/5">
+            <button onclick="setView('dashboard', this)" class="taskbar-item active p-3 rounded-xl bg-transparent text-zinc-400 hover:text-white transition-all hover:scale-110 group relative" id="btn-dashboard">
+                <i data-lucide="layout-grid" class="w-5 h-5"></i>
+                <span class="absolute -top-12 left-1/2 -translate-x-1/2 px-2 py-1 bg-black/90 rounded border border-white/10 text-xs opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">Dashboard</span>
+            </button>
+            <button onclick="setView('profile', this)" class="taskbar-item p-3 rounded-xl bg-transparent text-zinc-400 hover:text-white transition-all hover:scale-110 group relative" id="btn-profile">
+                <i data-lucide="user-circle" class="w-5 h-5"></i>
+                <span class="absolute -top-12 left-1/2 -translate-x-1/2 px-2 py-1 bg-black/90 rounded border border-white/10 text-xs opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">Profile Settings</span>
+            </button>
+            <button onclick="setView('achievements', this)" class="taskbar-item p-3 rounded-xl bg-transparent text-zinc-400 hover:text-white transition-all hover:scale-110 group relative">
+                <i data-lucide="trophy" class="w-5 h-5"></i>
+                <span class="absolute -top-12 left-1/2 -translate-x-1/2 px-2 py-1 bg-black/90 rounded border border-white/10 text-xs opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">Achievements</span>
+            </button>
+            <div class="w-[1px] h-8 bg-white/10 mx-1"></div>
+            <button onclick="setView('author', this)" class="taskbar-item p-3 rounded-xl bg-gradient-to-tr from-yellow-500 to-orange-500 text-white shadow-lg shadow-orange-500/20 hover:brightness-110 transition-all hover:-translate-y-2 hover:scale-110 group relative">
+                <i data-lucide="pen-tool" class="w-5 h-5"></i>
+                <span class="absolute -top-12 left-1/2 -translate-x-1/2 px-2 py-1 bg-black/90 rounded border border-yellow-500/50 text-xs opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap text-yellow-400 font-bold">Author Panel</span>
+            </button>
+        </div>
+    </div>
+
+    <script>
+        lucide.createIcons();
+
+        // --- 1. STARFIELD ENGINE ---
+        const canvas = document.getElementById('starfield');
+        const ctx = canvas.getContext('2d');
+        let width, height, stars = [];
+        let mouseX = 0, mouseY = 0, targetX = 0, targetY = 0;
+        document.addEventListener('mousemove', (e) => { mouseX = (e.clientX - width/2)*0.02; mouseY = (e.clientY - height/2)*0.02; });
+        function resize() { width = window.innerWidth; height = window.innerHeight; canvas.width = width; canvas.height = height; }
+        window.addEventListener('resize', resize); resize();
+        class Star {
+            constructor() { this.x = Math.random()*width; this.y = Math.random()*height; this.z = Math.random()*1.5; this.size = Math.random()*1.2; this.opacity = Math.random(); this.speed = Math.random()*0.05+0.02; }
+            update() { this.y -= this.speed; this.opacity += (Math.random()*0.02-0.01); if(this.opacity<0.1)this.opacity=0.1; if(this.opacity>0.8)this.opacity=0.8; if(this.y<0)this.y=height; }
+            draw() { let px=this.x-(targetX*this.z); let py=this.y-(targetY*this.z); ctx.fillStyle=`rgba(255,255,255,${this.opacity})`; ctx.beginPath(); ctx.arc(px, py, this.size, 0, Math.PI*2); ctx.fill(); }
+        }
+        for(let i=0; i<200; i++) stars.push(new Star());
+        function animateStars() { ctx.clearRect(0,0,width,height); targetX+=(mouseX-targetX)*0.05; targetY+=(mouseY-targetY)*0.05; stars.forEach(s=>{s.update();s.draw();}); requestAnimationFrame(animateStars); }
+        animateStars();
+
+        // --- 2. CURSOR ---
+        const cursor = document.getElementById('cursor');
+        document.addEventListener('mousemove', (e) => cursor.style.transform = `translate3d(${e.clientX-6}px, ${e.clientY-6}px, 0)`);
+        document.querySelectorAll('a, button, .bento-card, .cursor-pointer').forEach(el => {
+            el.addEventListener('mouseenter', () => document.body.classList.add('hovering'));
+            el.addEventListener('mouseleave', () => document.body.classList.remove('hovering'));
+        });
+
+        // --- 3. VIEW LOGIC ---
+        function setView(viewName, btn) {
+            ['view-dashboard', 'view-profile', 'view-achievements', 'view-author'].forEach(id => {
+                document.getElementById(id).classList.add('hidden-view');
+                document.getElementById(id).classList.remove('animate-enter');
+            });
+            const target = document.getElementById(`view-${viewName}`);
+            target.classList.remove('hidden-view');
+            void target.offsetWidth; 
+            target.classList.add('animate-enter');
+
+            document.querySelectorAll('.taskbar-item').forEach(b => b.classList.remove('active'));
+            if(btn) {
+                btn.classList.add('active');
+            } else {
+                const mapping = {'dashboard': 'btn-dashboard', 'profile': 'btn-profile'};
+                if(mapping[viewName]) document.getElementById(mapping[viewName]).classList.add('active');
+            }
+        }
+
+        function editProfile() {
+            setView('profile');
+        }
+
+        function switchTab(tabId, btn) {
+             ['reading', 'tbr', 'completed'].forEach(c => document.getElementById(`tab-${c}`).classList.add('hidden'));
+             document.getElementById(`tab-${tabId}`).classList.remove('hidden');
+             document.querySelectorAll('.tab-btn').forEach(b => { 
+                 b.classList.remove('active', 'bg-white/10', 'shadow-[0_0_10px_rgba(255,255,255,0.1)]'); 
+                 b.classList.add('text-zinc-400'); 
+             });
+             btn.classList.add('active', 'bg-white/10', 'shadow-[0_0_10px_rgba(255,255,255,0.1)]'); 
+             btn.classList.remove('text-zinc-400');
+        }
     </script>
 </body>
 </html>
